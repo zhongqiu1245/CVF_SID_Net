@@ -1,0 +1,1863 @@
+2023/07/09 10:40:55 - mmengine - INFO - 
+------------------------------------------------------------
+System environment:
+    sys.platform: linux
+    Python: 3.10.12 | packaged by conda-forge | (main, Jun 23 2023, 22:40:32) [GCC 12.3.0]
+    CUDA available: True
+    numpy_random_seed: 167636732
+    GPU 0: NVIDIA GeForce RTX 2060
+    CUDA_HOME: /usr/local/cuda
+    NVCC: Cuda compilation tools, release 11.7, V11.7.64
+    GCC: gcc (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0
+    PyTorch: 2.0.1+cu117
+    PyTorch compiling details: PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201703
+  - Intel(R) oneAPI Math Kernel Library Version 2022.2-Product Build 20220804 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.7.3 (Git Hash 6dbeffbae1f23cbbeae17adb7b5b13f1f37c080e)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.7
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.6  (built against CUDA 11.8)
+    - Built with CuDNN 8.5
+  - Magma 2.6.1
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.7, CUDNN_VERSION=8.5.0, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -D_GLIBCXX_USE_CXX11_ABI=0 -fabi-version=11 -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOROCTRACER -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wunused-local-typedefs -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_DISABLE_GPU_ASSERTS=ON, TORCH_VERSION=2.0.1, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=1, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+    TorchVision: 0.15.2+cu117
+    OpenCV: 4.5.4
+    MMEngine: 0.7.4
+
+Runtime environment:
+    cudnn_benchmark: False
+    mp_cfg: {'mp_start_method': 'fork', 'opencv_num_threads': 4}
+    dist_cfg: {'backend': 'nccl'}
+    seed: 167636732
+    Distributed launcher: none
+    Distributed training: False
+    GPU number: 1
+------------------------------------------------------------
+
+2023/07/09 10:40:55 - mmengine - INFO - Config:
+default_scope = 'mmagic'
+save_dir = './work_dirs/'
+default_hooks = dict(
+    timer=dict(type='IterTimerHook'),
+    logger=dict(type='LoggerHook', interval=10),
+    param_scheduler=dict(type='ParamSchedulerHook'),
+    checkpoint=dict(
+        type='CheckpointHook',
+        interval=1,
+        out_dir='./work_dirs/',
+        by_epoch=True,
+        save_optimizer=True,
+        max_keep_ckpts=10,
+        save_best='PSNR',
+        rule='greater'),
+    sampler_seed=dict(type='DistSamplerSeedHook'))
+env_cfg = dict(
+    cudnn_benchmark=False,
+    mp_cfg=dict(mp_start_method='fork', opencv_num_threads=4),
+    dist_cfg=dict(backend='nccl'))
+log_level = 'INFO'
+log_processor = dict(type='LogProcessor', window_size=100, by_epoch=True)
+load_from = None
+resume = False
+vis_backends = [dict(type='LocalVisBackend')]
+visualizer = dict(
+    type='ConcatImageVisualizer',
+    vis_backends=[dict(type='LocalVisBackend')],
+    fn_key='gt_path',
+    img_keys=['gt_img', 'input', 'pred_img'],
+    bgr2rgb=False)
+custom_hooks = [
+    dict(
+        type='BasicVisualizationHook',
+        interval=1,
+        on_train=False,
+        on_val=False,
+        on_test=False)
+]
+max_epochs = 100
+experiment_name = 'cvfsid_1xb24_100e_sidd'
+work_dir = './work_dirs/cvfsid_1xb24_100e_sidd'
+model = dict(
+    type='BaseEditModel',
+    generator=dict(
+        type='CVFSIDNet',
+        color_channels=3,
+        mid_channels=64,
+        num_layers=(17, (10, 4, 4)),
+        restructure_in_test=True),
+    pixel_loss=dict(
+        type='CVFSIDLoss',
+        loss_weight=1.0,
+        re_pad=10,
+        gamma=1.0,
+        reduction='mean'),
+    train_cfg=dict(),
+    test_cfg=dict(),
+    data_preprocessor=dict(
+        type='DataPreprocessor',
+        mean=[0.0, 0.0, 0.0],
+        std=[255.0, 255.0, 255.0]))
+train_pipeline = [
+    dict(type='LoadImageFromFile', key='img', channel_order='rgb'),
+    dict(type='PatchStd', key='img', std_kernel_size=6),
+    dict(type='Crop', keys=['img'], crop_size=(40, 40), random_crop=True),
+    dict(type='Flip', keys=['img'], flip_ratio=0.5, direction='horizontal'),
+    dict(type='Flip', keys=['img'], flip_ratio=0.5, direction='vertical'),
+    dict(type='RandomTransposeHW', keys=['img'], transpose_ratio=0.5),
+    dict(
+        type='NumpyPad',
+        keys=['img'],
+        padding=((10, 10), (10, 10), (0, 0)),
+        mode='reflect'),
+    dict(type='PackInputs', meta_keys=['patch_std'])
+]
+val_pipeline = [
+    dict(type='LoadImageFromFile', key='img', channel_order='rgb'),
+    dict(type='LoadImageFromFile', key='gt', channel_order='rgb'),
+    dict(type='PackInputs')
+]
+dataset_type = 'BasicImageDataset'
+train_dataloader = dict(
+    num_workers=8,
+    batch_size=24,
+    persistent_workers=True,
+    sampler=dict(type='DefaultSampler', shuffle=True),
+    dataset=dict(
+        type='BasicImageDataset',
+        metainfo=dict(dataset_type='my_sidd', task_name='my_denoising'),
+        data_root='./data/SIDD_Val_and_GT_Benchamrk/train',
+        data_prefix=dict(img='noisy'),
+        pipeline=[
+            dict(type='LoadImageFromFile', key='img', channel_order='rgb'),
+            dict(type='PatchStd', key='img', std_kernel_size=6),
+            dict(
+                type='Crop',
+                keys=['img'],
+                crop_size=(40, 40),
+                random_crop=True),
+            dict(
+                type='Flip',
+                keys=['img'],
+                flip_ratio=0.5,
+                direction='horizontal'),
+            dict(
+                type='Flip',
+                keys=['img'],
+                flip_ratio=0.5,
+                direction='vertical'),
+            dict(type='RandomTransposeHW', keys=['img'], transpose_ratio=0.5),
+            dict(
+                type='NumpyPad',
+                keys=['img'],
+                padding=((10, 10), (10, 10), (0, 0)),
+                mode='reflect'),
+            dict(type='PackInputs', meta_keys=['patch_std'])
+        ]))
+val_dataloader = dict(
+    num_workers=8,
+    batch_size=24,
+    persistent_workers=True,
+    drop_last=False,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    dataset=dict(
+        type='BasicImageDataset',
+        metainfo=dict(dataset_type='my_sidd', task_name='my_denoising'),
+        data_root='./data/SIDD_Val_and_GT_Benchamrk/val/',
+        data_prefix=dict(img='noisy', gt='gt'),
+        pipeline=[
+            dict(type='LoadImageFromFile', key='img', channel_order='rgb'),
+            dict(type='LoadImageFromFile', key='gt', channel_order='rgb'),
+            dict(type='PackInputs')
+        ]))
+test_dataloader = dict(
+    num_workers=8,
+    batch_size=24,
+    persistent_workers=True,
+    drop_last=False,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    dataset=dict(
+        type='BasicImageDataset',
+        metainfo=dict(dataset_type='my_sidd', task_name='my_denoising'),
+        data_root='./data/SIDD_Val_and_GT_Benchamrk/val/',
+        data_prefix=dict(img='noisy', gt='gt'),
+        pipeline=[
+            dict(type='LoadImageFromFile', key='img', channel_order='rgb'),
+            dict(type='LoadImageFromFile', key='gt', channel_order='rgb'),
+            dict(type='PackInputs')
+        ]))
+val_evaluator = [dict(type='MAE'), dict(type='PSNR'), dict(type='SSIM')]
+test_evaluator = [dict(type='MAE'), dict(type='PSNR'), dict(type='SSIM')]
+train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=100, val_interval=1)
+val_cfg = dict(type='MultiValLoop')
+test_cfg = dict(type='MultiTestLoop')
+optim_wrapper = dict(
+    constructor='DefaultOptimWrapperConstructor',
+    type='AmpOptimWrapper',
+    optimizer=dict(type='Adam', lr=0.0001, weight_decay=1e-09, amsgrad=True))
+param_scheduler = [
+    dict(type='LinearLR', start_factor=0.001, by_epoch=False, begin=0, end=24),
+    dict(
+        type='StepLR',
+        begin=0,
+        end=100,
+        by_epoch=True,
+        step_size=10,
+        gamma=0.99)
+]
+launcher = 'none'
+
+2023/07/09 10:40:57 - mmengine - INFO - Distributed training is not used, all SyncBatchNorm (SyncBN) layers in the model will be automatically reverted to BatchNormXd layers if they are used.
+2023/07/09 10:40:57 - mmengine - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+before_train:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) DistSamplerSeedHook                
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) BasicVisualizationHook             
+(BELOW_NORMAL) LoggerHook                         
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) IterTimerHook                      
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+before_val_iter:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) BasicVisualizationHook             
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_val_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+after_train:
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_test_epoch:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+before_test_iter:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_test_iter:
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) BasicVisualizationHook             
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_test_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_run:
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+2023/07/09 10:40:58 - mmengine - INFO - [35mWorking directory: ./work_dirs/cvfsid_1xb24_100e_sidd[0m
+2023/07/09 10:40:58 - mmengine - INFO - [35mLog directory: /media/shuozhang/DATA/Processing/OFFICE/CodingFactory/ImageCoding/mmWorkShop/mmagic/work_dirs/cvfsid_1xb24_100e_sidd/20230709_104054[0m
+2023/07/09 10:40:58 - mmengine - WARNING - my_sidd is not a meta file, simply parsed as meta information
+2023/07/09 10:40:58 - mmengine - WARNING - my_denoising is not a meta file, simply parsed as meta information
+2023/07/09 10:40:58 - mmengine - WARNING - The prefix is not set in metric class MAE.
+2023/07/09 10:40:58 - mmengine - WARNING - The prefix is not set in metric class PSNR.
+2023/07/09 10:40:58 - mmengine - WARNING - The prefix is not set in metric class SSIM.
+Name of parameter - Initialization information
+
+generator.gen_clean.gen_clean.0.conv.weight - torch.Size([64, 3, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.0.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.1.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.1.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.2.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.2.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.3.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.3.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.4.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.4.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.5.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.5.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.6.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.6.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.7.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.7.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.8.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.8.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.9.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.9.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.10.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.10.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.11.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.11.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.12.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.12.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.13.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.13.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.14.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.14.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.15.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.15.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_clean.gen_clean.16.conv.weight - torch.Size([3, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_clean.gen_clean.16.conv.bias - torch.Size([3]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_body.0.conv.weight - torch.Size([64, 3, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_body.0.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_body.1.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_body.1.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_body.2.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_body.2.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_body.3.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_body.3.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_body.4.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_body.4.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_body.5.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_body.5.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_body.6.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_body.6.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_body.7.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_body.7.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_body.8.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_body.8.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_body.9.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_body.9.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_w.0.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_w.0.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_w.1.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_w.1.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_w.2.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_w.2.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_w.3.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_w.3.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_w.4.conv.weight - torch.Size([3, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_w.4.conv.bias - torch.Size([3]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_b.0.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_b.0.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_b.1.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_b.1.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_b.2.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_b.2.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_b.3.conv.weight - torch.Size([64, 64, 3, 3]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_b.3.conv.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+
+generator.gen_noise.gen_noise_b.4.conv.weight - torch.Size([3, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in CVFSIDNet  
+
+generator.gen_noise.gen_noise_b.4.conv.bias - torch.Size([3]): 
+The value is the same before and after calling `init_weights` of BaseEditModel  
+2023/07/09 10:40:58 - mmengine - WARNING - "FileClient" will be deprecated in future. Please use io functions in https://mmengine.readthedocs.io/en/latest/api/fileio.html#file-io
+2023/07/09 10:40:59 - mmengine - WARNING - "HardDiskBackend" is the alias of "LocalBackend" and the former will be deprecated in future.
+2023/07/09 10:40:59 - mmengine - INFO - Checkpoints will be saved to ./work_dirs/cvfsid_1xb24_100e_sidd.
+2023/07/09 10:41:01 - mmengine - WARNING - Cannot find key 'gt_img' in data sample.
+2023/07/09 10:41:11 - mmengine - INFO - Epoch(train)   [1][10/54]  lr: 3.9191e-05  memory: 4260  data_time: 0.3006  loss: 0.1128  time: 1.2288
+2023/07/09 10:41:19 - mmengine - INFO - Epoch(train)   [1][20/54]  lr: 8.2626e-05  memory: 4260  data_time: 0.1531  loss: 0.1156  time: 1.0132
+2023/07/09 10:41:27 - mmengine - INFO - Epoch(train)   [1][30/54]  lr: 1.0000e-04  memory: 4260  data_time: 0.1056  loss: 0.0983  time: 0.9457
+2023/07/09 10:41:35 - mmengine - INFO - Epoch(train)   [1][40/54]  lr: 1.0000e-04  memory: 4260  data_time: 0.0817  loss: 0.0820  time: 0.9120
+2023/07/09 10:41:43 - mmengine - INFO - Epoch(train)   [1][50/54]  lr: 1.0000e-04  memory: 4260  data_time: 0.0674  loss: 0.0698  time: 0.8917
+2023/07/09 10:41:46 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 10:41:46 - mmengine - INFO - Saving checkpoint at 1 epochs
+2023/07/09 10:41:56 - mmengine - INFO - Epoch(val)   [1][10/54]    memory: 4260  
+2023/07/09 10:42:05 - mmengine - INFO - Epoch(val)   [1][20/54]    memory: 1247  
+2023/07/09 10:42:14 - mmengine - INFO - Epoch(val)   [1][30/54]    memory: 1247  
+2023/07/09 10:42:22 - mmengine - INFO - Epoch(val)   [1][40/54]    memory: 1247  
+2023/07/09 10:42:31 - mmengine - INFO - Epoch(val)   [1][50/54]    memory: 1247  
+2023/07/09 10:42:34 - mmengine - INFO - Epoch(val) [1][54/54]    MAE: 0.0386  PSNR: 26.9683  SSIM: 0.8328  data_time: 0.0174  time: 0.8940
+2023/07/09 10:42:34 - mmengine - INFO - The best checkpoint with 26.9683 PSNR at 1 epoch is saved to best_PSNR_epoch_1.pth.
+2023/07/09 10:42:45 - mmengine - INFO - Epoch(train)   [2][10/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0841  loss: 0.0581  time: 0.8989
+2023/07/09 10:42:53 - mmengine - INFO - Epoch(train)   [2][20/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0734  loss: 0.0520  time: 0.8877
+2023/07/09 10:43:01 - mmengine - INFO - Epoch(train)   [2][30/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0659  loss: 0.0475  time: 0.8798
+2023/07/09 10:43:10 - mmengine - INFO - Epoch(train)   [2][40/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0600  loss: 0.0437  time: 0.8736
+2023/07/09 10:43:18 - mmengine - INFO - Epoch(train)   [2][50/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0280  loss: 0.0381  time: 0.8282
+2023/07/09 10:43:21 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 10:43:21 - mmengine - INFO - Saving checkpoint at 2 epochs
+2023/07/09 10:43:30 - mmengine - INFO - Epoch(val)   [2][10/54]    memory: 4130  
+2023/07/09 10:43:39 - mmengine - INFO - Epoch(val)   [2][20/54]    memory: 1247  
+2023/07/09 10:43:48 - mmengine - INFO - Epoch(val)   [2][30/54]    memory: 1247  
+2023/07/09 10:43:57 - mmengine - INFO - Epoch(val)   [2][40/54]    memory: 1247  
+2023/07/09 10:44:06 - mmengine - INFO - Epoch(val)   [2][50/54]    memory: 1247  
+2023/07/09 10:44:09 - mmengine - INFO - Epoch(val) [2][54/54]    MAE: 0.0341  PSNR: 28.8500  SSIM: 0.8561  data_time: 0.0120  time: 0.8822
+2023/07/09 10:44:09 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_1.pth is removed
+2023/07/09 10:44:09 - mmengine - INFO - The best checkpoint with 28.8500 PSNR at 2 epoch is saved to best_PSNR_epoch_2.pth.
+2023/07/09 10:44:20 - mmengine - INFO - Epoch(train)   [3][10/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0479  loss: 0.0234  time: 0.8476
+2023/07/09 10:44:28 - mmengine - INFO - Epoch(train)   [3][20/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0476  loss: 0.0161  time: 0.8489
+2023/07/09 10:44:36 - mmengine - INFO - Epoch(train)   [3][30/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0476  loss: 0.0138  time: 0.8506
+2023/07/09 10:44:44 - mmengine - INFO - Epoch(train)   [3][40/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0477  loss: 0.0124  time: 0.8522
+2023/07/09 10:44:53 - mmengine - INFO - Epoch(train)   [3][50/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0291  loss: 0.0117  time: 0.8384
+2023/07/09 10:44:55 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 10:44:55 - mmengine - INFO - Saving checkpoint at 3 epochs
+2023/07/09 10:45:05 - mmengine - INFO - Epoch(val)   [3][10/54]    memory: 4130  
+2023/07/09 10:45:14 - mmengine - INFO - Epoch(val)   [3][20/54]    memory: 1247  
+2023/07/09 10:45:23 - mmengine - INFO - Epoch(val)   [3][30/54]    memory: 1247  
+2023/07/09 10:45:32 - mmengine - INFO - Epoch(val)   [3][40/54]    memory: 1247  
+2023/07/09 10:45:41 - mmengine - INFO - Epoch(val)   [3][50/54]    memory: 1247  
+2023/07/09 10:45:44 - mmengine - INFO - Epoch(val) [3][54/54]    MAE: 0.0335  PSNR: 29.3046  SSIM: 0.8559  data_time: 0.0115  time: 0.8863
+2023/07/09 10:45:44 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_2.pth is removed
+2023/07/09 10:45:44 - mmengine - INFO - The best checkpoint with 29.3046 PSNR at 3 epoch is saved to best_PSNR_epoch_3.pth.
+2023/07/09 10:45:55 - mmengine - INFO - Epoch(train)   [4][10/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0557  loss: 0.0108  time: 0.8613
+2023/07/09 10:46:04 - mmengine - INFO - Epoch(train)   [4][20/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0555  loss: 0.0101  time: 0.8619
+2023/07/09 10:46:12 - mmengine - INFO - Epoch(train)   [4][30/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0554  loss: 0.0096  time: 0.8626
+2023/07/09 10:46:20 - mmengine - INFO - Epoch(train)   [4][40/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0555  loss: 0.0091  time: 0.8634
+2023/07/09 10:46:29 - mmengine - INFO - Epoch(train)   [4][50/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0360  loss: 0.0085  time: 0.8485
+2023/07/09 10:46:31 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 10:46:31 - mmengine - INFO - Saving checkpoint at 4 epochs
+2023/07/09 10:46:41 - mmengine - INFO - Epoch(val)   [4][10/54]    memory: 4130  
+2023/07/09 10:46:50 - mmengine - INFO - Epoch(val)   [4][20/54]    memory: 1247  
+2023/07/09 10:46:59 - mmengine - INFO - Epoch(val)   [4][30/54]    memory: 1247  
+2023/07/09 10:47:08 - mmengine - INFO - Epoch(val)   [4][40/54]    memory: 1247  
+2023/07/09 10:47:17 - mmengine - INFO - Epoch(val)   [4][50/54]    memory: 1247  
+2023/07/09 10:47:20 - mmengine - INFO - Epoch(val) [4][54/54]    MAE: 0.0330  PSNR: 29.5132  SSIM: 0.8581  data_time: 0.0116  time: 0.8902
+2023/07/09 10:47:20 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_3.pth is removed
+2023/07/09 10:47:21 - mmengine - INFO - The best checkpoint with 29.5132 PSNR at 4 epoch is saved to best_PSNR_epoch_4.pth.
+2023/07/09 10:47:32 - mmengine - INFO - Epoch(train)   [5][10/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0621  loss: 0.0082  time: 0.8706
+2023/07/09 10:47:40 - mmengine - INFO - Epoch(train)   [5][20/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0620  loss: 0.0077  time: 0.8708
+2023/07/09 10:47:48 - mmengine - INFO - Epoch(train)   [5][30/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0619  loss: 0.0075  time: 0.8711
+2023/07/09 10:47:57 - mmengine - INFO - Epoch(train)   [5][40/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0619  loss: 0.0072  time: 0.8716
+2023/07/09 10:48:05 - mmengine - INFO - Epoch(train)   [5][50/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0356  loss: 0.0070  time: 0.8501
+2023/07/09 10:48:08 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 10:48:08 - mmengine - INFO - Saving checkpoint at 5 epochs
+2023/07/09 10:48:17 - mmengine - INFO - Epoch(val)   [5][10/54]    memory: 4130  
+2023/07/09 10:48:26 - mmengine - INFO - Epoch(val)   [5][20/54]    memory: 1247  
+2023/07/09 10:48:35 - mmengine - INFO - Epoch(val)   [5][30/54]    memory: 1247  
+2023/07/09 10:48:44 - mmengine - INFO - Epoch(val)   [5][40/54]    memory: 1247  
+2023/07/09 10:48:53 - mmengine - INFO - Epoch(val)   [5][50/54]    memory: 1247  
+2023/07/09 10:48:56 - mmengine - INFO - Epoch(val) [5][54/54]    MAE: 0.0346  PSNR: 29.2244  SSIM: 0.8590  data_time: 0.0122  time: 0.8903
+2023/07/09 10:49:08 - mmengine - INFO - Epoch(train)   [6][10/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0621  loss: 0.0068  time: 0.8729
+2023/07/09 10:49:16 - mmengine - INFO - Epoch(train)   [6][20/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0618  loss: 0.0065  time: 0.8727
+2023/07/09 10:49:24 - mmengine - INFO - Epoch(train)   [6][30/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0618  loss: 0.0064  time: 0.8729
+2023/07/09 10:49:32 - mmengine - INFO - Epoch(train)   [6][40/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0619  loss: 0.0062  time: 0.8732
+2023/07/09 10:49:41 - mmengine - INFO - Epoch(train)   [6][50/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0358  loss: 0.0059  time: 0.8519
+2023/07/09 10:49:44 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 10:49:44 - mmengine - INFO - Saving checkpoint at 6 epochs
+2023/07/09 10:49:53 - mmengine - INFO - Epoch(val)   [6][10/54]    memory: 4130  
+2023/07/09 10:50:02 - mmengine - INFO - Epoch(val)   [6][20/54]    memory: 1247  
+2023/07/09 10:50:11 - mmengine - INFO - Epoch(val)   [6][30/54]    memory: 1247  
+2023/07/09 10:50:20 - mmengine - INFO - Epoch(val)   [6][40/54]    memory: 1247  
+2023/07/09 10:50:29 - mmengine - INFO - Epoch(val)   [6][50/54]    memory: 1247  
+2023/07/09 10:50:32 - mmengine - INFO - Epoch(val) [6][54/54]    MAE: 0.0341  PSNR: 29.1341  SSIM: 0.8592  data_time: 0.0113  time: 0.8924
+2023/07/09 10:50:44 - mmengine - INFO - Epoch(train)   [7][10/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0625  loss: 0.0057  time: 0.8746
+2023/07/09 10:50:52 - mmengine - INFO - Epoch(train)   [7][20/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0621  loss: 0.0054  time: 0.8744
+2023/07/09 10:51:00 - mmengine - INFO - Epoch(train)   [7][30/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0621  loss: 0.0053  time: 0.8746
+2023/07/09 10:51:08 - mmengine - INFO - Epoch(train)   [7][40/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0622  loss: 0.0051  time: 0.8750
+2023/07/09 10:51:17 - mmengine - INFO - Epoch(train)   [7][50/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0360  loss: 0.0050  time: 0.8532
+2023/07/09 10:51:20 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 10:51:20 - mmengine - INFO - Saving checkpoint at 7 epochs
+2023/07/09 10:51:29 - mmengine - INFO - Epoch(val)   [7][10/54]    memory: 4130  
+2023/07/09 10:51:38 - mmengine - INFO - Epoch(val)   [7][20/54]    memory: 1247  
+2023/07/09 10:51:47 - mmengine - INFO - Epoch(val)   [7][30/54]    memory: 1247  
+2023/07/09 10:51:56 - mmengine - INFO - Epoch(val)   [7][40/54]    memory: 1247  
+2023/07/09 10:52:06 - mmengine - INFO - Epoch(val)   [7][50/54]    memory: 1247  
+2023/07/09 10:52:09 - mmengine - INFO - Epoch(val) [7][54/54]    MAE: 0.0332  PSNR: 29.2606  SSIM: 0.8609  data_time: 0.0113  time: 0.8916
+2023/07/09 10:52:19 - mmengine - INFO - Epoch(train)   [8][10/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0546  loss: 0.0048  time: 0.8676
+2023/07/09 10:52:27 - mmengine - INFO - Epoch(train)   [8][20/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0542  loss: 0.0047  time: 0.8674
+2023/07/09 10:52:35 - mmengine - INFO - Epoch(train)   [8][30/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0542  loss: 0.0044  time: 0.8676
+2023/07/09 10:52:44 - mmengine - INFO - Epoch(train)   [8][40/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0542  loss: 0.0042  time: 0.8680
+2023/07/09 10:52:52 - mmengine - INFO - Epoch(train)   [8][50/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0282  loss: 0.0041  time: 0.8462
+2023/07/09 10:52:55 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 10:52:55 - mmengine - INFO - Saving checkpoint at 8 epochs
+2023/07/09 10:53:04 - mmengine - INFO - Epoch(val)   [8][10/54]    memory: 4130  
+2023/07/09 10:53:13 - mmengine - INFO - Epoch(val)   [8][20/54]    memory: 1247  
+2023/07/09 10:53:23 - mmengine - INFO - Epoch(val)   [8][30/54]    memory: 1247  
+2023/07/09 10:53:32 - mmengine - INFO - Epoch(val)   [8][40/54]    memory: 1247  
+2023/07/09 10:53:41 - mmengine - INFO - Epoch(val)   [8][50/54]    memory: 1247  
+2023/07/09 10:53:44 - mmengine - INFO - Epoch(val) [8][54/54]    MAE: 0.0252  PSNR: 31.1826  SSIM: 0.8661  data_time: 0.0118  time: 0.8925
+2023/07/09 10:53:44 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_4.pth is removed
+2023/07/09 10:53:44 - mmengine - INFO - The best checkpoint with 31.1826 PSNR at 8 epoch is saved to best_PSNR_epoch_8.pth.
+2023/07/09 10:53:55 - mmengine - INFO - Epoch(train)   [9][10/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0546  loss: 0.0039  time: 0.8685
+2023/07/09 10:54:04 - mmengine - INFO - Epoch(train)   [9][20/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0541  loss: 0.0037  time: 0.8681
+2023/07/09 10:54:12 - mmengine - INFO - Epoch(train)   [9][30/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0541  loss: 0.0035  time: 0.8680
+2023/07/09 10:54:20 - mmengine - INFO - Epoch(train)   [9][40/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0541  loss: 0.0033  time: 0.8681
+2023/07/09 10:54:29 - mmengine - INFO - Epoch(train)   [9][50/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0356  loss: 0.0033  time: 0.8540
+2023/07/09 10:54:31 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 10:54:31 - mmengine - INFO - Saving checkpoint at 9 epochs
+2023/07/09 10:54:41 - mmengine - INFO - Epoch(val)   [9][10/54]    memory: 4130  
+2023/07/09 10:54:50 - mmengine - INFO - Epoch(val)   [9][20/54]    memory: 1247  
+2023/07/09 10:54:59 - mmengine - INFO - Epoch(val)   [9][30/54]    memory: 1247  
+2023/07/09 10:55:08 - mmengine - INFO - Epoch(val)   [9][40/54]    memory: 1247  
+2023/07/09 10:55:18 - mmengine - INFO - Epoch(val)   [9][50/54]    memory: 1247  
+2023/07/09 10:55:21 - mmengine - INFO - Epoch(val) [9][54/54]    MAE: 0.0286  PSNR: 30.1302  SSIM: 0.8655  data_time: 0.0122  time: 0.8950
+2023/07/09 10:55:31 - mmengine - INFO - Epoch(train)  [10][10/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0545  loss: 0.0031  time: 0.8688
+2023/07/09 10:55:39 - mmengine - INFO - Epoch(train)  [10][20/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0541  loss: 0.0031  time: 0.8685
+2023/07/09 10:55:47 - mmengine - INFO - Epoch(train)  [10][30/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0541  loss: 0.0030  time: 0.8683
+2023/07/09 10:55:56 - mmengine - INFO - Epoch(train)  [10][40/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0541  loss: 0.0030  time: 0.8684
+2023/07/09 10:56:04 - mmengine - INFO - Epoch(train)  [10][50/54]  lr: 1.0000e-04  memory: 4130  data_time: 0.0277  loss: 0.0030  time: 0.8463
+2023/07/09 10:56:07 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 10:56:07 - mmengine - INFO - Saving checkpoint at 10 epochs
+2023/07/09 10:56:16 - mmengine - INFO - Epoch(val)  [10][10/54]    memory: 4130  
+2023/07/09 10:56:26 - mmengine - INFO - Epoch(val)  [10][20/54]    memory: 1247  
+2023/07/09 10:56:35 - mmengine - INFO - Epoch(val)  [10][30/54]    memory: 1247  
+2023/07/09 10:56:44 - mmengine - INFO - Epoch(val)  [10][40/54]    memory: 1247  
+2023/07/09 10:56:53 - mmengine - INFO - Epoch(val)  [10][50/54]    memory: 1247  
+2023/07/09 10:56:56 - mmengine - INFO - Epoch(val) [10][54/54]    MAE: 0.0237  PSNR: 31.7094  SSIM: 0.8675  data_time: 0.0115  time: 0.8945
+2023/07/09 10:56:56 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_8.pth is removed
+2023/07/09 10:56:56 - mmengine - INFO - The best checkpoint with 31.7094 PSNR at 10 epoch is saved to best_PSNR_epoch_10.pth.
+2023/07/09 10:57:07 - mmengine - INFO - Epoch(train)  [11][10/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0467  loss: 0.0029  time: 0.8613
+2023/07/09 10:57:15 - mmengine - INFO - Epoch(train)  [11][20/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0462  loss: 0.0028  time: 0.8609
+2023/07/09 10:57:23 - mmengine - INFO - Epoch(train)  [11][30/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0461  loss: 0.0027  time: 0.8610
+2023/07/09 10:57:32 - mmengine - INFO - Epoch(train)  [11][40/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0461  loss: 0.0025  time: 0.8612
+2023/07/09 10:57:40 - mmengine - INFO - Epoch(train)  [11][50/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0275  loss: 0.0025  time: 0.8468
+2023/07/09 10:57:43 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 10:57:43 - mmengine - INFO - Saving checkpoint at 11 epochs
+2023/07/09 10:57:52 - mmengine - INFO - Epoch(val)  [11][10/54]    memory: 4130  
+2023/07/09 10:58:01 - mmengine - INFO - Epoch(val)  [11][20/54]    memory: 1247  
+2023/07/09 10:58:11 - mmengine - INFO - Epoch(val)  [11][30/54]    memory: 1247  
+2023/07/09 10:58:20 - mmengine - INFO - Epoch(val)  [11][40/54]    memory: 1247  
+2023/07/09 10:58:29 - mmengine - INFO - Epoch(val)  [11][50/54]    memory: 1247  
+2023/07/09 10:58:32 - mmengine - INFO - Epoch(val) [11][54/54]    MAE: 0.0209  PSNR: 32.7797  SSIM: 0.8663  data_time: 0.0120  time: 0.8963
+2023/07/09 10:58:32 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_10.pth is removed
+2023/07/09 10:58:32 - mmengine - INFO - The best checkpoint with 32.7797 PSNR at 11 epoch is saved to best_PSNR_epoch_11.pth.
+2023/07/09 10:58:43 - mmengine - INFO - Epoch(train)  [12][10/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0542  loss: 0.0022  time: 0.8689
+2023/07/09 10:58:52 - mmengine - INFO - Epoch(train)  [12][20/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0540  loss: 0.0021  time: 0.8688
+2023/07/09 10:59:00 - mmengine - INFO - Epoch(train)  [12][30/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0540  loss: 0.0020  time: 0.8688
+2023/07/09 10:59:08 - mmengine - INFO - Epoch(train)  [12][40/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0541  loss: 0.0019  time: 0.8688
+2023/07/09 10:59:17 - mmengine - INFO - Epoch(train)  [12][50/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0356  loss: 0.0019  time: 0.8545
+2023/07/09 10:59:20 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 10:59:20 - mmengine - INFO - Saving checkpoint at 12 epochs
+2023/07/09 10:59:29 - mmengine - INFO - Epoch(val)  [12][10/54]    memory: 4130  
+2023/07/09 10:59:38 - mmengine - INFO - Epoch(val)  [12][20/54]    memory: 1247  
+2023/07/09 10:59:47 - mmengine - INFO - Epoch(val)  [12][30/54]    memory: 1247  
+2023/07/09 10:59:56 - mmengine - INFO - Epoch(val)  [12][40/54]    memory: 1247  
+2023/07/09 11:00:06 - mmengine - INFO - Epoch(val)  [12][50/54]    memory: 1247  
+2023/07/09 11:00:09 - mmengine - INFO - Epoch(val) [12][54/54]    MAE: 0.0232  PSNR: 31.9227  SSIM: 0.8670  data_time: 0.0117  time: 0.8947
+2023/07/09 11:00:19 - mmengine - INFO - Epoch(train)  [13][10/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0538  loss: 0.0019  time: 0.8684
+2023/07/09 11:00:27 - mmengine - INFO - Epoch(train)  [13][20/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0540  loss: 0.0019  time: 0.8685
+2023/07/09 11:00:36 - mmengine - INFO - Epoch(train)  [13][30/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0540  loss: 0.0018  time: 0.8685
+2023/07/09 11:00:44 - mmengine - INFO - Epoch(train)  [13][40/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0541  loss: 0.0018  time: 0.8687
+2023/07/09 11:00:52 - mmengine - INFO - Epoch(train)  [13][50/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0277  loss: 0.0018  time: 0.8467
+2023/07/09 11:00:55 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:00:55 - mmengine - INFO - Saving checkpoint at 13 epochs
+2023/07/09 11:01:05 - mmengine - INFO - Epoch(val)  [13][10/54]    memory: 4130  
+2023/07/09 11:01:14 - mmengine - INFO - Epoch(val)  [13][20/54]    memory: 1247  
+2023/07/09 11:01:23 - mmengine - INFO - Epoch(val)  [13][30/54]    memory: 1247  
+2023/07/09 11:01:32 - mmengine - INFO - Epoch(val)  [13][40/54]    memory: 1247  
+2023/07/09 11:01:41 - mmengine - INFO - Epoch(val)  [13][50/54]    memory: 1247  
+2023/07/09 11:01:44 - mmengine - INFO - Epoch(val) [13][54/54]    MAE: 0.0238  PSNR: 31.6983  SSIM: 0.8678  data_time: 0.0120  time: 0.8962
+2023/07/09 11:01:54 - mmengine - INFO - Epoch(train)  [14][10/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0463  loss: 0.0018  time: 0.8612
+2023/07/09 11:02:03 - mmengine - INFO - Epoch(train)  [14][20/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0463  loss: 0.0018  time: 0.8612
+2023/07/09 11:02:11 - mmengine - INFO - Epoch(train)  [14][30/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0462  loss: 0.0018  time: 0.8612
+2023/07/09 11:02:19 - mmengine - INFO - Epoch(train)  [14][40/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0462  loss: 0.0018  time: 0.8615
+2023/07/09 11:02:28 - mmengine - INFO - Epoch(train)  [14][50/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0278  loss: 0.0018  time: 0.8472
+2023/07/09 11:02:31 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:02:31 - mmengine - INFO - Saving checkpoint at 14 epochs
+2023/07/09 11:02:40 - mmengine - INFO - Epoch(val)  [14][10/54]    memory: 4130  
+2023/07/09 11:02:49 - mmengine - INFO - Epoch(val)  [14][20/54]    memory: 1247  
+2023/07/09 11:02:58 - mmengine - INFO - Epoch(val)  [14][30/54]    memory: 1247  
+2023/07/09 11:03:08 - mmengine - INFO - Epoch(val)  [14][40/54]    memory: 1247  
+2023/07/09 11:03:17 - mmengine - INFO - Epoch(val)  [14][50/54]    memory: 1247  
+2023/07/09 11:03:20 - mmengine - INFO - Epoch(val) [14][54/54]    MAE: 0.0244  PSNR: 31.6038  SSIM: 0.8668  data_time: 0.0116  time: 0.8951
+2023/07/09 11:03:31 - mmengine - INFO - Epoch(train)  [15][10/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0545  loss: 0.0018  time: 0.8692
+2023/07/09 11:03:39 - mmengine - INFO - Epoch(train)  [15][20/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0541  loss: 0.0018  time: 0.8688
+2023/07/09 11:03:47 - mmengine - INFO - Epoch(train)  [15][30/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0541  loss: 0.0018  time: 0.8687
+2023/07/09 11:03:56 - mmengine - INFO - Epoch(train)  [15][40/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0541  loss: 0.0017  time: 0.8688
+2023/07/09 11:04:04 - mmengine - INFO - Epoch(train)  [15][50/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0356  loss: 0.0017  time: 0.8546
+2023/07/09 11:04:07 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:04:07 - mmengine - INFO - Saving checkpoint at 15 epochs
+2023/07/09 11:04:16 - mmengine - INFO - Epoch(val)  [15][10/54]    memory: 4130  
+2023/07/09 11:04:26 - mmengine - INFO - Epoch(val)  [15][20/54]    memory: 1247  
+2023/07/09 11:04:35 - mmengine - INFO - Epoch(val)  [15][30/54]    memory: 1247  
+2023/07/09 11:04:44 - mmengine - INFO - Epoch(val)  [15][40/54]    memory: 1247  
+2023/07/09 11:04:53 - mmengine - INFO - Epoch(val)  [15][50/54]    memory: 1247  
+2023/07/09 11:04:56 - mmengine - INFO - Epoch(val) [15][54/54]    MAE: 0.0220  PSNR: 32.4175  SSIM: 0.8694  data_time: 0.0121  time: 0.8969
+2023/07/09 11:05:07 - mmengine - INFO - Epoch(train)  [16][10/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0567  loss: 0.0016  time: 0.8717
+2023/07/09 11:05:15 - mmengine - INFO - Epoch(train)  [16][20/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0566  loss: 0.0016  time: 0.8716
+2023/07/09 11:05:23 - mmengine - INFO - Epoch(train)  [16][30/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0567  loss: 0.0016  time: 0.8716
+2023/07/09 11:05:32 - mmengine - INFO - Epoch(train)  [16][40/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0568  loss: 0.0015  time: 0.8718
+2023/07/09 11:05:40 - mmengine - INFO - Epoch(train)  [16][50/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0307  loss: 0.0015  time: 0.8502
+2023/07/09 11:05:43 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:05:43 - mmengine - INFO - Saving checkpoint at 16 epochs
+2023/07/09 11:05:52 - mmengine - INFO - Epoch(val)  [16][10/54]    memory: 4130  
+2023/07/09 11:06:01 - mmengine - INFO - Epoch(val)  [16][20/54]    memory: 1247  
+2023/07/09 11:06:11 - mmengine - INFO - Epoch(val)  [16][30/54]    memory: 1247  
+2023/07/09 11:06:20 - mmengine - INFO - Epoch(val)  [16][40/54]    memory: 1247  
+2023/07/09 11:06:29 - mmengine - INFO - Epoch(val)  [16][50/54]    memory: 1247  
+2023/07/09 11:06:32 - mmengine - INFO - Epoch(val) [16][54/54]    MAE: 0.0229  PSNR: 32.0189  SSIM: 0.8687  data_time: 0.0122  time: 0.8951
+2023/07/09 11:06:42 - mmengine - INFO - Epoch(train)  [17][10/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0491  loss: 0.0016  time: 0.8645
+2023/07/09 11:06:51 - mmengine - INFO - Epoch(train)  [17][20/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0491  loss: 0.0016  time: 0.8645
+2023/07/09 11:06:59 - mmengine - INFO - Epoch(train)  [17][30/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0491  loss: 0.0015  time: 0.8645
+2023/07/09 11:07:07 - mmengine - INFO - Epoch(train)  [17][40/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0492  loss: 0.0015  time: 0.8646
+2023/07/09 11:07:16 - mmengine - INFO - Epoch(train)  [17][50/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0282  loss: 0.0015  time: 0.8475
+2023/07/09 11:07:18 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:07:18 - mmengine - INFO - Saving checkpoint at 17 epochs
+2023/07/09 11:07:28 - mmengine - INFO - Epoch(val)  [17][10/54]    memory: 4130  
+2023/07/09 11:07:37 - mmengine - INFO - Epoch(val)  [17][20/54]    memory: 1247  
+2023/07/09 11:07:46 - mmengine - INFO - Epoch(val)  [17][30/54]    memory: 1247  
+2023/07/09 11:07:55 - mmengine - INFO - Epoch(val)  [17][40/54]    memory: 1247  
+2023/07/09 11:08:04 - mmengine - INFO - Epoch(val)  [17][50/54]    memory: 1247  
+2023/07/09 11:08:07 - mmengine - INFO - Epoch(val) [17][54/54]    MAE: 0.0236  PSNR: 31.9129  SSIM: 0.8682  data_time: 0.0118  time: 0.8937
+2023/07/09 11:08:18 - mmengine - INFO - Epoch(train)  [18][10/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0491  loss: 0.0015  time: 0.8643
+2023/07/09 11:08:26 - mmengine - INFO - Epoch(train)  [18][20/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0489  loss: 0.0015  time: 0.8640
+2023/07/09 11:08:35 - mmengine - INFO - Epoch(train)  [18][30/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0490  loss: 0.0015  time: 0.8640
+2023/07/09 11:08:43 - mmengine - INFO - Epoch(train)  [18][40/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0490  loss: 0.0015  time: 0.8641
+2023/07/09 11:08:51 - mmengine - INFO - Epoch(train)  [18][50/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0305  loss: 0.0014  time: 0.8497
+2023/07/09 11:08:54 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:08:54 - mmengine - INFO - Saving checkpoint at 18 epochs
+2023/07/09 11:09:04 - mmengine - INFO - Epoch(val)  [18][10/54]    memory: 4130  
+2023/07/09 11:09:13 - mmengine - INFO - Epoch(val)  [18][20/54]    memory: 1247  
+2023/07/09 11:09:22 - mmengine - INFO - Epoch(val)  [18][30/54]    memory: 1247  
+2023/07/09 11:09:31 - mmengine - INFO - Epoch(val)  [18][40/54]    memory: 1247  
+2023/07/09 11:09:40 - mmengine - INFO - Epoch(val)  [18][50/54]    memory: 1247  
+2023/07/09 11:09:43 - mmengine - INFO - Epoch(val) [18][54/54]    MAE: 0.0206  PSNR: 33.1520  SSIM: 0.8694  data_time: 0.0116  time: 0.8948
+2023/07/09 11:09:43 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_11.pth is removed
+2023/07/09 11:09:43 - mmengine - INFO - The best checkpoint with 33.1520 PSNR at 18 epoch is saved to best_PSNR_epoch_18.pth.
+2023/07/09 11:09:54 - mmengine - INFO - Epoch(train)  [19][10/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0510  loss: 0.0013  time: 0.8661
+2023/07/09 11:10:02 - mmengine - INFO - Epoch(train)  [19][20/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0511  loss: 0.0013  time: 0.8661
+2023/07/09 11:10:09 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:10:11 - mmengine - INFO - Epoch(train)  [19][30/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0510  loss: 0.0013  time: 0.8661
+2023/07/09 11:10:19 - mmengine - INFO - Epoch(train)  [19][40/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0510  loss: 0.0013  time: 0.8662
+2023/07/09 11:10:27 - mmengine - INFO - Epoch(train)  [19][50/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0301  loss: 0.0013  time: 0.8494
+2023/07/09 11:10:30 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:10:30 - mmengine - INFO - Saving checkpoint at 19 epochs
+2023/07/09 11:10:40 - mmengine - INFO - Epoch(val)  [19][10/54]    memory: 4130  
+2023/07/09 11:10:49 - mmengine - INFO - Epoch(val)  [19][20/54]    memory: 1247  
+2023/07/09 11:10:58 - mmengine - INFO - Epoch(val)  [19][30/54]    memory: 1247  
+2023/07/09 11:11:07 - mmengine - INFO - Epoch(val)  [19][40/54]    memory: 1247  
+2023/07/09 11:11:16 - mmengine - INFO - Epoch(val)  [19][50/54]    memory: 1247  
+2023/07/09 11:11:19 - mmengine - INFO - Epoch(val) [19][54/54]    MAE: 0.0231  PSNR: 31.9255  SSIM: 0.8682  data_time: 0.0112  time: 0.8929
+2023/07/09 11:11:30 - mmengine - INFO - Epoch(train)  [20][10/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0488  loss: 0.0013  time: 0.8637
+2023/07/09 11:11:38 - mmengine - INFO - Epoch(train)  [20][20/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0485  loss: 0.0013  time: 0.8635
+2023/07/09 11:11:46 - mmengine - INFO - Epoch(train)  [20][30/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0486  loss: 0.0013  time: 0.8635
+2023/07/09 11:11:55 - mmengine - INFO - Epoch(train)  [20][40/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0486  loss: 0.0013  time: 0.8637
+2023/07/09 11:12:03 - mmengine - INFO - Epoch(train)  [20][50/54]  lr: 9.9000e-05  memory: 4130  data_time: 0.0279  loss: 0.0013  time: 0.8473
+2023/07/09 11:12:06 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:12:06 - mmengine - INFO - Saving checkpoint at 20 epochs
+2023/07/09 11:12:15 - mmengine - INFO - Epoch(val)  [20][10/54]    memory: 4130  
+2023/07/09 11:12:24 - mmengine - INFO - Epoch(val)  [20][20/54]    memory: 1247  
+2023/07/09 11:12:34 - mmengine - INFO - Epoch(val)  [20][30/54]    memory: 1247  
+2023/07/09 11:12:43 - mmengine - INFO - Epoch(val)  [20][40/54]    memory: 1247  
+2023/07/09 11:12:52 - mmengine - INFO - Epoch(val)  [20][50/54]    memory: 1247  
+2023/07/09 11:12:55 - mmengine - INFO - Epoch(val) [20][54/54]    MAE: 0.0221  PSNR: 32.3541  SSIM: 0.8685  data_time: 0.0117  time: 0.8936
+2023/07/09 11:13:06 - mmengine - INFO - Epoch(train)  [21][10/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0523  loss: 0.0014  time: 0.8671
+2023/07/09 11:13:14 - mmengine - INFO - Epoch(train)  [21][20/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0521  loss: 0.0014  time: 0.8667
+2023/07/09 11:13:22 - mmengine - INFO - Epoch(train)  [21][30/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0520  loss: 0.0014  time: 0.8665
+2023/07/09 11:13:31 - mmengine - INFO - Epoch(train)  [21][40/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0520  loss: 0.0015  time: 0.8665
+2023/07/09 11:13:39 - mmengine - INFO - Epoch(train)  [21][50/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0337  loss: 0.0015  time: 0.8525
+2023/07/09 11:13:42 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:13:42 - mmengine - INFO - Saving checkpoint at 21 epochs
+2023/07/09 11:13:51 - mmengine - INFO - Epoch(val)  [21][10/54]    memory: 4130  
+2023/07/09 11:14:00 - mmengine - INFO - Epoch(val)  [21][20/54]    memory: 1247  
+2023/07/09 11:14:10 - mmengine - INFO - Epoch(val)  [21][30/54]    memory: 1247  
+2023/07/09 11:14:19 - mmengine - INFO - Epoch(val)  [21][40/54]    memory: 1247  
+2023/07/09 11:14:28 - mmengine - INFO - Epoch(val)  [21][50/54]    memory: 1247  
+2023/07/09 11:14:31 - mmengine - INFO - Epoch(val) [21][54/54]    MAE: 0.0214  PSNR: 32.8983  SSIM: 0.8690  data_time: 0.0114  time: 0.8943
+2023/07/09 11:14:42 - mmengine - INFO - Epoch(train)  [22][10/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0603  loss: 0.0015  time: 0.8746
+2023/07/09 11:14:50 - mmengine - INFO - Epoch(train)  [22][20/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0599  loss: 0.0015  time: 0.8741
+2023/07/09 11:14:59 - mmengine - INFO - Epoch(train)  [22][30/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0599  loss: 0.0015  time: 0.8739
+2023/07/09 11:15:07 - mmengine - INFO - Epoch(train)  [22][40/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0599  loss: 0.0015  time: 0.8740
+2023/07/09 11:15:15 - mmengine - INFO - Epoch(train)  [22][50/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0358  loss: 0.0015  time: 0.8543
+2023/07/09 11:15:18 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:15:18 - mmengine - INFO - Saving checkpoint at 22 epochs
+2023/07/09 11:15:27 - mmengine - INFO - Epoch(val)  [22][10/54]    memory: 4130  
+2023/07/09 11:15:37 - mmengine - INFO - Epoch(val)  [22][20/54]    memory: 1247  
+2023/07/09 11:15:46 - mmengine - INFO - Epoch(val)  [22][30/54]    memory: 1247  
+2023/07/09 11:15:55 - mmengine - INFO - Epoch(val)  [22][40/54]    memory: 1247  
+2023/07/09 11:16:04 - mmengine - INFO - Epoch(val)  [22][50/54]    memory: 1247  
+2023/07/09 11:16:07 - mmengine - INFO - Epoch(val) [22][54/54]    MAE: 0.0210  PSNR: 32.9902  SSIM: 0.8694  data_time: 0.0117  time: 0.8940
+2023/07/09 11:16:17 - mmengine - INFO - Epoch(train)  [23][10/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0542  loss: 0.0015  time: 0.8686
+2023/07/09 11:16:26 - mmengine - INFO - Epoch(train)  [23][20/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0541  loss: 0.0014  time: 0.8685
+2023/07/09 11:16:34 - mmengine - INFO - Epoch(train)  [23][30/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0541  loss: 0.0014  time: 0.8686
+2023/07/09 11:16:42 - mmengine - INFO - Epoch(train)  [23][40/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0542  loss: 0.0013  time: 0.8689
+2023/07/09 11:16:51 - mmengine - INFO - Epoch(train)  [23][50/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0280  loss: 0.0013  time: 0.8470
+2023/07/09 11:16:53 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:16:53 - mmengine - INFO - Saving checkpoint at 23 epochs
+2023/07/09 11:17:03 - mmengine - INFO - Epoch(val)  [23][10/54]    memory: 4130  
+2023/07/09 11:17:12 - mmengine - INFO - Epoch(val)  [23][20/54]    memory: 1247  
+2023/07/09 11:17:21 - mmengine - INFO - Epoch(val)  [23][30/54]    memory: 1247  
+2023/07/09 11:17:30 - mmengine - INFO - Epoch(val)  [23][40/54]    memory: 1247  
+2023/07/09 11:17:40 - mmengine - INFO - Epoch(val)  [23][50/54]    memory: 1247  
+2023/07/09 11:17:43 - mmengine - INFO - Epoch(val) [23][54/54]    MAE: 0.0225  PSNR: 32.2361  SSIM: 0.8679  data_time: 0.0117  time: 0.8944
+2023/07/09 11:17:53 - mmengine - INFO - Epoch(train)  [24][10/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0466  loss: 0.0012  time: 0.8616
+2023/07/09 11:18:01 - mmengine - INFO - Epoch(train)  [24][20/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0466  loss: 0.0012  time: 0.8616
+2023/07/09 11:18:10 - mmengine - INFO - Epoch(train)  [24][30/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0467  loss: 0.0012  time: 0.8617
+2023/07/09 11:18:18 - mmengine - INFO - Epoch(train)  [24][40/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0467  loss: 0.0011  time: 0.8617
+2023/07/09 11:18:26 - mmengine - INFO - Epoch(train)  [24][50/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0286  loss: 0.0011  time: 0.8477
+2023/07/09 11:18:29 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:18:29 - mmengine - INFO - Saving checkpoint at 24 epochs
+2023/07/09 11:18:39 - mmengine - INFO - Epoch(val)  [24][10/54]    memory: 4130  
+2023/07/09 11:18:48 - mmengine - INFO - Epoch(val)  [24][20/54]    memory: 1247  
+2023/07/09 11:18:57 - mmengine - INFO - Epoch(val)  [24][30/54]    memory: 1247  
+2023/07/09 11:19:06 - mmengine - INFO - Epoch(val)  [24][40/54]    memory: 1247  
+2023/07/09 11:19:15 - mmengine - INFO - Epoch(val)  [24][50/54]    memory: 1247  
+2023/07/09 11:19:18 - mmengine - INFO - Epoch(val) [24][54/54]    MAE: 0.0217  PSNR: 32.5568  SSIM: 0.8686  data_time: 0.0120  time: 0.8956
+2023/07/09 11:19:29 - mmengine - INFO - Epoch(train)  [25][10/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0549  loss: 0.0011  time: 0.8695
+2023/07/09 11:19:37 - mmengine - INFO - Epoch(train)  [25][20/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0545  loss: 0.0011  time: 0.8691
+2023/07/09 11:19:46 - mmengine - INFO - Epoch(train)  [25][30/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0545  loss: 0.0011  time: 0.8690
+2023/07/09 11:19:54 - mmengine - INFO - Epoch(train)  [25][40/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0545  loss: 0.0011  time: 0.8690
+2023/07/09 11:20:02 - mmengine - INFO - Epoch(train)  [25][50/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0358  loss: 0.0011  time: 0.8543
+2023/07/09 11:20:05 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:20:05 - mmengine - INFO - Saving checkpoint at 25 epochs
+2023/07/09 11:20:15 - mmengine - INFO - Epoch(val)  [25][10/54]    memory: 4130  
+2023/07/09 11:20:24 - mmengine - INFO - Epoch(val)  [25][20/54]    memory: 1247  
+2023/07/09 11:20:33 - mmengine - INFO - Epoch(val)  [25][30/54]    memory: 1247  
+2023/07/09 11:20:42 - mmengine - INFO - Epoch(val)  [25][40/54]    memory: 1247  
+2023/07/09 11:20:51 - mmengine - INFO - Epoch(val)  [25][50/54]    memory: 1247  
+2023/07/09 11:20:54 - mmengine - INFO - Epoch(val) [25][54/54]    MAE: 0.0220  PSNR: 32.3480  SSIM: 0.8704  data_time: 0.0113  time: 0.8927
+2023/07/09 11:21:05 - mmengine - INFO - Epoch(train)  [26][10/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0599  loss: 0.0011  time: 0.8740
+2023/07/09 11:21:13 - mmengine - INFO - Epoch(train)  [26][20/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0595  loss: 0.0011  time: 0.8736
+2023/07/09 11:21:22 - mmengine - INFO - Epoch(train)  [26][30/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0595  loss: 0.0012  time: 0.8735
+2023/07/09 11:21:30 - mmengine - INFO - Epoch(train)  [26][40/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0596  loss: 0.0012  time: 0.8736
+2023/07/09 11:21:38 - mmengine - INFO - Epoch(train)  [26][50/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0332  loss: 0.0013  time: 0.8517
+2023/07/09 11:21:41 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:21:41 - mmengine - INFO - Saving checkpoint at 26 epochs
+2023/07/09 11:21:51 - mmengine - INFO - Epoch(val)  [26][10/54]    memory: 4130  
+2023/07/09 11:22:00 - mmengine - INFO - Epoch(val)  [26][20/54]    memory: 1247  
+2023/07/09 11:22:09 - mmengine - INFO - Epoch(val)  [26][30/54]    memory: 1247  
+2023/07/09 11:22:18 - mmengine - INFO - Epoch(val)  [26][40/54]    memory: 1247  
+2023/07/09 11:22:27 - mmengine - INFO - Epoch(val)  [26][50/54]    memory: 1247  
+2023/07/09 11:22:30 - mmengine - INFO - Epoch(val) [26][54/54]    MAE: 0.0296  PSNR: 30.0933  SSIM: 0.8649  data_time: 0.0117  time: 0.8926
+2023/07/09 11:22:41 - mmengine - INFO - Epoch(train)  [27][10/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0566  loss: 0.0014  time: 0.8708
+2023/07/09 11:22:49 - mmengine - INFO - Epoch(train)  [27][20/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0562  loss: 0.0015  time: 0.8705
+2023/07/09 11:22:58 - mmengine - INFO - Epoch(train)  [27][30/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0562  loss: 0.0015  time: 0.8706
+2023/07/09 11:23:06 - mmengine - INFO - Epoch(train)  [27][40/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0562  loss: 0.0015  time: 0.8707
+2023/07/09 11:23:14 - mmengine - INFO - Epoch(train)  [27][50/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0323  loss: 0.0015  time: 0.8510
+2023/07/09 11:23:17 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:23:17 - mmengine - INFO - Saving checkpoint at 27 epochs
+2023/07/09 11:23:27 - mmengine - INFO - Epoch(val)  [27][10/54]    memory: 4130  
+2023/07/09 11:23:36 - mmengine - INFO - Epoch(val)  [27][20/54]    memory: 1247  
+2023/07/09 11:23:45 - mmengine - INFO - Epoch(val)  [27][30/54]    memory: 1247  
+2023/07/09 11:23:54 - mmengine - INFO - Epoch(val)  [27][40/54]    memory: 1247  
+2023/07/09 11:24:03 - mmengine - INFO - Epoch(val)  [27][50/54]    memory: 1247  
+2023/07/09 11:24:06 - mmengine - INFO - Epoch(val) [27][54/54]    MAE: 0.0233  PSNR: 31.8993  SSIM: 0.8686  data_time: 0.0117  time: 0.8945
+2023/07/09 11:24:16 - mmengine - INFO - Epoch(train)  [28][10/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0513  loss: 0.0015  time: 0.8658
+2023/07/09 11:24:25 - mmengine - INFO - Epoch(train)  [28][20/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0508  loss: 0.0014  time: 0.8653
+2023/07/09 11:24:33 - mmengine - INFO - Epoch(train)  [28][30/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0508  loss: 0.0014  time: 0.8653
+2023/07/09 11:24:41 - mmengine - INFO - Epoch(train)  [28][40/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0508  loss: 0.0013  time: 0.8653
+2023/07/09 11:24:50 - mmengine - INFO - Epoch(train)  [28][50/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0278  loss: 0.0013  time: 0.8465
+2023/07/09 11:24:53 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:24:53 - mmengine - INFO - Saving checkpoint at 28 epochs
+2023/07/09 11:25:02 - mmengine - INFO - Epoch(val)  [28][10/54]    memory: 4130  
+2023/07/09 11:25:11 - mmengine - INFO - Epoch(val)  [28][20/54]    memory: 1247  
+2023/07/09 11:25:20 - mmengine - INFO - Epoch(val)  [28][30/54]    memory: 1247  
+2023/07/09 11:25:29 - mmengine - INFO - Epoch(val)  [28][40/54]    memory: 1247  
+2023/07/09 11:25:39 - mmengine - INFO - Epoch(val)  [28][50/54]    memory: 1247  
+2023/07/09 11:25:42 - mmengine - INFO - Epoch(val) [28][54/54]    MAE: 0.0211  PSNR: 32.7816  SSIM: 0.8680  data_time: 0.0120  time: 0.8941
+2023/07/09 11:25:53 - mmengine - INFO - Epoch(train)  [29][10/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0542  loss: 0.0012  time: 0.8681
+2023/07/09 11:26:01 - mmengine - INFO - Epoch(train)  [29][20/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0539  loss: 0.0012  time: 0.8676
+2023/07/09 11:26:09 - mmengine - INFO - Epoch(train)  [29][30/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0539  loss: 0.0012  time: 0.8675
+2023/07/09 11:26:18 - mmengine - INFO - Epoch(train)  [29][40/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0539  loss: 0.0011  time: 0.8677
+2023/07/09 11:26:26 - mmengine - INFO - Epoch(train)  [29][50/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0354  loss: 0.0011  time: 0.8534
+2023/07/09 11:26:29 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:26:29 - mmengine - INFO - Saving checkpoint at 29 epochs
+2023/07/09 11:26:38 - mmengine - INFO - Epoch(val)  [29][10/54]    memory: 4130  
+2023/07/09 11:26:47 - mmengine - INFO - Epoch(val)  [29][20/54]    memory: 1247  
+2023/07/09 11:26:57 - mmengine - INFO - Epoch(val)  [29][30/54]    memory: 1247  
+2023/07/09 11:27:06 - mmengine - INFO - Epoch(val)  [29][40/54]    memory: 1247  
+2023/07/09 11:27:15 - mmengine - INFO - Epoch(val)  [29][50/54]    memory: 1247  
+2023/07/09 11:27:18 - mmengine - INFO - Epoch(val) [29][54/54]    MAE: 0.0222  PSNR: 32.2637  SSIM: 0.8685  data_time: 0.0137  time: 0.8984
+2023/07/09 11:27:29 - mmengine - INFO - Epoch(train)  [30][10/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0623  loss: 0.0011  time: 0.8759
+2023/07/09 11:27:37 - mmengine - INFO - Epoch(train)  [30][20/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0619  loss: 0.0011  time: 0.8754
+2023/07/09 11:27:46 - mmengine - INFO - Epoch(train)  [30][30/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0620  loss: 0.0011  time: 0.8755
+2023/07/09 11:27:54 - mmengine - INFO - Epoch(train)  [30][40/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0620  loss: 0.0010  time: 0.8757
+2023/07/09 11:28:02 - mmengine - INFO - Epoch(train)  [30][50/54]  lr: 9.8010e-05  memory: 4130  data_time: 0.0361  loss: 0.0010  time: 0.8543
+2023/07/09 11:28:05 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:28:05 - mmengine - INFO - Saving checkpoint at 30 epochs
+2023/07/09 11:28:15 - mmengine - INFO - Epoch(val)  [30][10/54]    memory: 4130  
+2023/07/09 11:28:24 - mmengine - INFO - Epoch(val)  [30][20/54]    memory: 1247  
+2023/07/09 11:28:33 - mmengine - INFO - Epoch(val)  [30][30/54]    memory: 1247  
+2023/07/09 11:28:42 - mmengine - INFO - Epoch(val)  [30][40/54]    memory: 1247  
+2023/07/09 11:28:51 - mmengine - INFO - Epoch(val)  [30][50/54]    memory: 1247  
+2023/07/09 11:28:54 - mmengine - INFO - Epoch(val) [30][54/54]    MAE: 0.0227  PSNR: 32.1298  SSIM: 0.8656  data_time: 0.0123  time: 0.8967
+2023/07/09 11:29:05 - mmengine - INFO - Epoch(train)  [31][10/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0579  loss: 0.0010  time: 0.8721
+2023/07/09 11:29:13 - mmengine - INFO - Epoch(train)  [31][20/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0576  loss: 0.0011  time: 0.8719
+2023/07/09 11:29:22 - mmengine - INFO - Epoch(train)  [31][30/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0576  loss: 0.0011  time: 0.8720
+2023/07/09 11:29:30 - mmengine - INFO - Epoch(train)  [31][40/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0576  loss: 0.0011  time: 0.8722
+2023/07/09 11:29:38 - mmengine - INFO - Epoch(train)  [31][50/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0311  loss: 0.0011  time: 0.8502
+2023/07/09 11:29:41 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:29:41 - mmengine - INFO - Saving checkpoint at 31 epochs
+2023/07/09 11:29:51 - mmengine - INFO - Epoch(val)  [31][10/54]    memory: 4130  
+2023/07/09 11:30:00 - mmengine - INFO - Epoch(val)  [31][20/54]    memory: 1247  
+2023/07/09 11:30:09 - mmengine - INFO - Epoch(val)  [31][30/54]    memory: 1247  
+2023/07/09 11:30:18 - mmengine - INFO - Epoch(val)  [31][40/54]    memory: 1247  
+2023/07/09 11:30:27 - mmengine - INFO - Epoch(val)  [31][50/54]    memory: 1247  
+2023/07/09 11:30:30 - mmengine - INFO - Epoch(val) [31][54/54]    MAE: 0.0241  PSNR: 31.5496  SSIM: 0.8688  data_time: 0.0119  time: 0.8967
+2023/07/09 11:30:41 - mmengine - INFO - Epoch(train)  [32][10/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0501  loss: 0.0011  time: 0.8651
+2023/07/09 11:30:49 - mmengine - INFO - Epoch(train)  [32][20/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0500  loss: 0.0012  time: 0.8651
+2023/07/09 11:30:57 - mmengine - INFO - Epoch(train)  [32][30/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0502  loss: 0.0012  time: 0.8657
+2023/07/09 11:31:06 - mmengine - INFO - Epoch(train)  [32][40/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0503  loss: 0.0012  time: 0.8661
+2023/07/09 11:31:14 - mmengine - INFO - Epoch(train)  [32][50/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0287  loss: 0.0011  time: 0.8492
+2023/07/09 11:31:17 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:31:17 - mmengine - INFO - Saving checkpoint at 32 epochs
+2023/07/09 11:31:27 - mmengine - INFO - Epoch(val)  [32][10/54]    memory: 4130  
+2023/07/09 11:31:36 - mmengine - INFO - Epoch(val)  [32][20/54]    memory: 1247  
+2023/07/09 11:31:45 - mmengine - INFO - Epoch(val)  [32][30/54]    memory: 1247  
+2023/07/09 11:31:54 - mmengine - INFO - Epoch(val)  [32][40/54]    memory: 1247  
+2023/07/09 11:32:03 - mmengine - INFO - Epoch(val)  [32][50/54]    memory: 1247  
+2023/07/09 11:32:06 - mmengine - INFO - Epoch(val) [32][54/54]    MAE: 0.0220  PSNR: 32.4115  SSIM: 0.8684  data_time: 0.0127  time: 0.8991
+2023/07/09 11:32:17 - mmengine - INFO - Epoch(train)  [33][10/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0485  loss: 0.0011  time: 0.8656
+2023/07/09 11:32:25 - mmengine - INFO - Epoch(train)  [33][20/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0482  loss: 0.0011  time: 0.8655
+2023/07/09 11:32:33 - mmengine - INFO - Epoch(train)  [33][30/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0483  loss: 0.0011  time: 0.8657
+2023/07/09 11:32:42 - mmengine - INFO - Epoch(train)  [33][40/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0483  loss: 0.0011  time: 0.8673
+2023/07/09 11:32:50 - mmengine - INFO - Epoch(train)  [33][50/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0295  loss: 0.0011  time: 0.8537
+2023/07/09 11:32:53 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:32:53 - mmengine - INFO - Saving checkpoint at 33 epochs
+2023/07/09 11:33:03 - mmengine - INFO - Epoch(val)  [33][10/54]    memory: 4130  
+2023/07/09 11:33:12 - mmengine - INFO - Epoch(val)  [33][20/54]    memory: 1247  
+2023/07/09 11:33:21 - mmengine - INFO - Epoch(val)  [33][30/54]    memory: 1247  
+2023/07/09 11:33:30 - mmengine - INFO - Epoch(val)  [33][40/54]    memory: 1247  
+2023/07/09 11:33:39 - mmengine - INFO - Epoch(val)  [33][50/54]    memory: 1247  
+2023/07/09 11:33:42 - mmengine - INFO - Epoch(val) [33][54/54]    MAE: 0.0210  PSNR: 32.9600  SSIM: 0.8698  data_time: 0.0118  time: 0.8991
+2023/07/09 11:33:53 - mmengine - INFO - Epoch(train)  [34][10/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0478  loss: 0.0010  time: 0.8684
+2023/07/09 11:34:01 - mmengine - INFO - Epoch(train)  [34][20/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0476  loss: 0.0010  time: 0.8681
+2023/07/09 11:34:10 - mmengine - INFO - Epoch(train)  [34][30/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0476  loss: 0.0010  time: 0.8685
+2023/07/09 11:34:18 - mmengine - INFO - Epoch(train)  [34][40/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0475  loss: 0.0010  time: 0.8696
+2023/07/09 11:34:26 - mmengine - INFO - Epoch(train)  [34][50/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0280  loss: 0.0010  time: 0.8547
+2023/07/09 11:34:29 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:34:29 - mmengine - INFO - Saving checkpoint at 34 epochs
+2023/07/09 11:34:39 - mmengine - INFO - Epoch(val)  [34][10/54]    memory: 4130  
+2023/07/09 11:34:48 - mmengine - INFO - Epoch(val)  [34][20/54]    memory: 1247  
+2023/07/09 11:34:57 - mmengine - INFO - Epoch(val)  [34][30/54]    memory: 1247  
+2023/07/09 11:35:06 - mmengine - INFO - Epoch(val)  [34][40/54]    memory: 1247  
+2023/07/09 11:35:16 - mmengine - INFO - Epoch(val)  [34][50/54]    memory: 1247  
+2023/07/09 11:35:19 - mmengine - INFO - Epoch(val) [34][54/54]    MAE: 0.0219  PSNR: 32.5273  SSIM: 0.8695  data_time: 0.0122  time: 0.8995
+2023/07/09 11:35:29 - mmengine - INFO - Epoch(train)  [35][10/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0480  loss: 0.0010  time: 0.8709
+2023/07/09 11:35:37 - mmengine - INFO - Epoch(train)  [35][20/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0476  loss: 0.0010  time: 0.8706
+2023/07/09 11:35:46 - mmengine - INFO - Epoch(train)  [35][30/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0476  loss: 0.0010  time: 0.8704
+2023/07/09 11:35:54 - mmengine - INFO - Epoch(train)  [35][40/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0477  loss: 0.0010  time: 0.8703
+2023/07/09 11:36:03 - mmengine - INFO - Epoch(train)  [35][50/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0293  loss: 0.0012  time: 0.8565
+2023/07/09 11:36:06 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:36:06 - mmengine - INFO - Saving checkpoint at 35 epochs
+2023/07/09 11:36:15 - mmengine - INFO - Epoch(val)  [35][10/54]    memory: 4130  
+2023/07/09 11:36:24 - mmengine - INFO - Epoch(val)  [35][20/54]    memory: 1247  
+2023/07/09 11:36:34 - mmengine - INFO - Epoch(val)  [35][30/54]    memory: 1247  
+2023/07/09 11:36:43 - mmengine - INFO - Epoch(val)  [35][40/54]    memory: 1247  
+2023/07/09 11:36:52 - mmengine - INFO - Epoch(val)  [35][50/54]    memory: 1247  
+2023/07/09 11:36:55 - mmengine - INFO - Epoch(val) [35][54/54]    MAE: 0.0263  PSNR: 30.8340  SSIM: 0.8674  data_time: 0.0120  time: 0.8992
+2023/07/09 11:37:06 - mmengine - INFO - Epoch(train)  [36][10/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0563  loss: 0.0015  time: 0.8792
+2023/07/09 11:37:14 - mmengine - INFO - Epoch(train)  [36][20/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0558  loss: 0.0016  time: 0.8783
+2023/07/09 11:37:23 - mmengine - INFO - Epoch(train)  [36][30/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0558  loss: 0.0017  time: 0.8770
+2023/07/09 11:37:31 - mmengine - INFO - Epoch(train)  [36][40/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0558  loss: 0.0017  time: 0.8770
+2023/07/09 11:37:40 - mmengine - INFO - Epoch(train)  [36][50/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0362  loss: 0.0017  time: 0.8615
+2023/07/09 11:37:42 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:37:42 - mmengine - INFO - Saving checkpoint at 36 epochs
+2023/07/09 11:37:52 - mmengine - INFO - Epoch(val)  [36][10/54]    memory: 4130  
+2023/07/09 11:38:01 - mmengine - INFO - Epoch(val)  [36][20/54]    memory: 1247  
+2023/07/09 11:38:10 - mmengine - INFO - Epoch(val)  [36][30/54]    memory: 1247  
+2023/07/09 11:38:20 - mmengine - INFO - Epoch(val)  [36][40/54]    memory: 1247  
+2023/07/09 11:38:29 - mmengine - INFO - Epoch(val)  [36][50/54]    memory: 1247  
+2023/07/09 11:38:32 - mmengine - INFO - Epoch(val) [36][54/54]    MAE: 0.0230  PSNR: 31.9495  SSIM: 0.8691  data_time: 0.0121  time: 0.8990
+2023/07/09 11:38:43 - mmengine - INFO - Epoch(train)  [37][10/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0628  loss: 0.0017  time: 0.8839
+2023/07/09 11:38:51 - mmengine - INFO - Epoch(train)  [37][20/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0625  loss: 0.0018  time: 0.8827
+2023/07/09 11:39:00 - mmengine - INFO - Epoch(train)  [37][30/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0624  loss: 0.0018  time: 0.8820
+2023/07/09 11:39:08 - mmengine - INFO - Epoch(train)  [37][40/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0624  loss: 0.0017  time: 0.8819
+2023/07/09 11:39:16 - mmengine - INFO - Epoch(train)  [37][50/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0358  loss: 0.0015  time: 0.8597
+2023/07/09 11:39:19 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:39:19 - mmengine - INFO - Saving checkpoint at 37 epochs
+2023/07/09 11:39:29 - mmengine - INFO - Epoch(val)  [37][10/54]    memory: 4130  
+2023/07/09 11:39:38 - mmengine - INFO - Epoch(val)  [37][20/54]    memory: 1247  
+2023/07/09 11:39:47 - mmengine - INFO - Epoch(val)  [37][30/54]    memory: 1247  
+2023/07/09 11:39:56 - mmengine - INFO - Epoch(val)  [37][40/54]    memory: 1247  
+2023/07/09 11:40:05 - mmengine - INFO - Epoch(val)  [37][50/54]    memory: 1247  
+2023/07/09 11:40:08 - mmengine - INFO - Epoch(val) [37][54/54]    MAE: 0.0236  PSNR: 31.8143  SSIM: 0.8677  data_time: 0.0125  time: 0.8984
+2023/07/09 11:40:12 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:40:19 - mmengine - INFO - Epoch(train)  [38][10/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0547  loss: 0.0014  time: 0.8745
+2023/07/09 11:40:27 - mmengine - INFO - Epoch(train)  [38][20/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0544  loss: 0.0014  time: 0.8741
+2023/07/09 11:40:35 - mmengine - INFO - Epoch(train)  [38][30/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0544  loss: 0.0014  time: 0.8734
+2023/07/09 11:40:44 - mmengine - INFO - Epoch(train)  [38][40/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0545  loss: 0.0014  time: 0.8729
+2023/07/09 11:40:52 - mmengine - INFO - Epoch(train)  [38][50/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0282  loss: 0.0014  time: 0.8508
+2023/07/09 11:40:55 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:40:55 - mmengine - INFO - Saving checkpoint at 38 epochs
+2023/07/09 11:41:05 - mmengine - INFO - Epoch(val)  [38][10/54]    memory: 4130  
+2023/07/09 11:41:14 - mmengine - INFO - Epoch(val)  [38][20/54]    memory: 1247  
+2023/07/09 11:41:23 - mmengine - INFO - Epoch(val)  [38][30/54]    memory: 1247  
+2023/07/09 11:41:32 - mmengine - INFO - Epoch(val)  [38][40/54]    memory: 1247  
+2023/07/09 11:41:41 - mmengine - INFO - Epoch(val)  [38][50/54]    memory: 1247  
+2023/07/09 11:41:44 - mmengine - INFO - Epoch(val) [38][54/54]    MAE: 0.0231  PSNR: 32.1212  SSIM: 0.8700  data_time: 0.0124  time: 0.8992
+2023/07/09 11:41:55 - mmengine - INFO - Epoch(train)  [39][10/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0468  loss: 0.0013  time: 0.8655
+2023/07/09 11:42:03 - mmengine - INFO - Epoch(train)  [39][20/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0469  loss: 0.0013  time: 0.8660
+2023/07/09 11:42:11 - mmengine - INFO - Epoch(train)  [39][30/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0469  loss: 0.0013  time: 0.8652
+2023/07/09 11:42:20 - mmengine - INFO - Epoch(train)  [39][40/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0469  loss: 0.0013  time: 0.8652
+2023/07/09 11:42:28 - mmengine - INFO - Epoch(train)  [39][50/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0281  loss: 0.0013  time: 0.8509
+2023/07/09 11:42:31 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:42:31 - mmengine - INFO - Saving checkpoint at 39 epochs
+2023/07/09 11:42:41 - mmengine - INFO - Epoch(val)  [39][10/54]    memory: 4130  
+2023/07/09 11:42:50 - mmengine - INFO - Epoch(val)  [39][20/54]    memory: 1247  
+2023/07/09 11:42:59 - mmengine - INFO - Epoch(val)  [39][30/54]    memory: 1247  
+2023/07/09 11:43:08 - mmengine - INFO - Epoch(val)  [39][40/54]    memory: 1247  
+2023/07/09 11:43:17 - mmengine - INFO - Epoch(val)  [39][50/54]    memory: 1247  
+2023/07/09 11:43:20 - mmengine - INFO - Epoch(val) [39][54/54]    MAE: 0.0217  PSNR: 32.5948  SSIM: 0.8682  data_time: 0.0117  time: 0.8942
+2023/07/09 11:43:30 - mmengine - INFO - Epoch(train)  [40][10/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0469  loss: 0.0012  time: 0.8653
+2023/07/09 11:43:39 - mmengine - INFO - Epoch(train)  [40][20/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0465  loss: 0.0011  time: 0.8648
+2023/07/09 11:43:47 - mmengine - INFO - Epoch(train)  [40][30/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0465  loss: 0.0011  time: 0.8644
+2023/07/09 11:43:55 - mmengine - INFO - Epoch(train)  [40][40/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0464  loss: 0.0011  time: 0.8638
+2023/07/09 11:44:04 - mmengine - INFO - Epoch(train)  [40][50/54]  lr: 9.7030e-05  memory: 4130  data_time: 0.0278  loss: 0.0010  time: 0.8491
+2023/07/09 11:44:07 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:44:07 - mmengine - INFO - Saving checkpoint at 40 epochs
+2023/07/09 11:44:16 - mmengine - INFO - Epoch(val)  [40][10/54]    memory: 4130  
+2023/07/09 11:44:25 - mmengine - INFO - Epoch(val)  [40][20/54]    memory: 1247  
+2023/07/09 11:44:34 - mmengine - INFO - Epoch(val)  [40][30/54]    memory: 1247  
+2023/07/09 11:44:43 - mmengine - INFO - Epoch(val)  [40][40/54]    memory: 1247  
+2023/07/09 11:44:53 - mmengine - INFO - Epoch(val)  [40][50/54]    memory: 1247  
+2023/07/09 11:44:56 - mmengine - INFO - Epoch(val) [40][54/54]    MAE: 0.0210  PSNR: 32.8227  SSIM: 0.8700  data_time: 0.0114  time: 0.8940
+2023/07/09 11:45:07 - mmengine - INFO - Epoch(train)  [41][10/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0543  loss: 0.0010  time: 0.8704
+2023/07/09 11:45:15 - mmengine - INFO - Epoch(train)  [41][20/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0539  loss: 0.0009  time: 0.8699
+2023/07/09 11:45:23 - mmengine - INFO - Epoch(train)  [41][30/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0540  loss: 0.0009  time: 0.8697
+2023/07/09 11:45:32 - mmengine - INFO - Epoch(train)  [41][40/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0540  loss: 0.0009  time: 0.8690
+2023/07/09 11:45:40 - mmengine - INFO - Epoch(train)  [41][50/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0356  loss: 0.0009  time: 0.8546
+2023/07/09 11:45:43 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:45:43 - mmengine - INFO - Saving checkpoint at 41 epochs
+2023/07/09 11:45:52 - mmengine - INFO - Epoch(val)  [41][10/54]    memory: 4130  
+2023/07/09 11:46:01 - mmengine - INFO - Epoch(val)  [41][20/54]    memory: 1247  
+2023/07/09 11:46:11 - mmengine - INFO - Epoch(val)  [41][30/54]    memory: 1247  
+2023/07/09 11:46:20 - mmengine - INFO - Epoch(val)  [41][40/54]    memory: 1247  
+2023/07/09 11:46:29 - mmengine - INFO - Epoch(val)  [41][50/54]    memory: 1247  
+2023/07/09 11:46:32 - mmengine - INFO - Epoch(val) [41][54/54]    MAE: 0.0208  PSNR: 32.8806  SSIM: 0.8697  data_time: 0.0116  time: 0.8944
+2023/07/09 11:46:43 - mmengine - INFO - Epoch(train)  [42][10/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0620  loss: 0.0009  time: 0.8765
+2023/07/09 11:46:51 - mmengine - INFO - Epoch(train)  [42][20/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0616  loss: 0.0008  time: 0.8760
+2023/07/09 11:47:00 - mmengine - INFO - Epoch(train)  [42][30/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0617  loss: 0.0008  time: 0.8759
+2023/07/09 11:47:08 - mmengine - INFO - Epoch(train)  [42][40/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0617  loss: 0.0008  time: 0.8759
+2023/07/09 11:47:16 - mmengine - INFO - Epoch(train)  [42][50/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0354  loss: 0.0008  time: 0.8539
+2023/07/09 11:47:19 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:47:19 - mmengine - INFO - Saving checkpoint at 42 epochs
+2023/07/09 11:47:28 - mmengine - INFO - Epoch(val)  [42][10/54]    memory: 4130  
+2023/07/09 11:47:38 - mmengine - INFO - Epoch(val)  [42][20/54]    memory: 1247  
+2023/07/09 11:47:47 - mmengine - INFO - Epoch(val)  [42][30/54]    memory: 1247  
+2023/07/09 11:47:56 - mmengine - INFO - Epoch(val)  [42][40/54]    memory: 1247  
+2023/07/09 11:48:05 - mmengine - INFO - Epoch(val)  [42][50/54]    memory: 1247  
+2023/07/09 11:48:08 - mmengine - INFO - Epoch(val) [42][54/54]    MAE: 0.0205  PSNR: 33.0340  SSIM: 0.8705  data_time: 0.0116  time: 0.8919
+2023/07/09 11:48:19 - mmengine - INFO - Epoch(train)  [43][10/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0615  loss: 0.0008  time: 0.8755
+2023/07/09 11:48:27 - mmengine - INFO - Epoch(train)  [43][20/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0612  loss: 0.0008  time: 0.8751
+2023/07/09 11:48:36 - mmengine - INFO - Epoch(train)  [43][30/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0612  loss: 0.0008  time: 0.8749
+2023/07/09 11:48:44 - mmengine - INFO - Epoch(train)  [43][40/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0612  loss: 0.0009  time: 0.8750
+2023/07/09 11:48:52 - mmengine - INFO - Epoch(train)  [43][50/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0353  loss: 0.0010  time: 0.8534
+2023/07/09 11:48:55 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:48:55 - mmengine - INFO - Saving checkpoint at 43 epochs
+2023/07/09 11:49:05 - mmengine - INFO - Epoch(val)  [43][10/54]    memory: 4130  
+2023/07/09 11:49:14 - mmengine - INFO - Epoch(val)  [43][20/54]    memory: 1247  
+2023/07/09 11:49:23 - mmengine - INFO - Epoch(val)  [43][30/54]    memory: 1247  
+2023/07/09 11:49:32 - mmengine - INFO - Epoch(val)  [43][40/54]    memory: 1247  
+2023/07/09 11:49:41 - mmengine - INFO - Epoch(val)  [43][50/54]    memory: 1247  
+2023/07/09 11:49:44 - mmengine - INFO - Epoch(val) [43][54/54]    MAE: 0.0296  PSNR: 30.0204  SSIM: 0.8653  data_time: 0.0114  time: 0.8929
+2023/07/09 11:49:55 - mmengine - INFO - Epoch(train)  [44][10/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0616  loss: 0.0012  time: 0.8756
+2023/07/09 11:50:03 - mmengine - INFO - Epoch(train)  [44][20/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0614  loss: 0.0013  time: 0.8755
+2023/07/09 11:50:12 - mmengine - INFO - Epoch(train)  [44][30/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0615  loss: 0.0014  time: 0.8756
+2023/07/09 11:50:20 - mmengine - INFO - Epoch(train)  [44][40/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0615  loss: 0.0014  time: 0.8758
+2023/07/09 11:50:28 - mmengine - INFO - Epoch(train)  [44][50/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0357  loss: 0.0014  time: 0.8544
+2023/07/09 11:50:31 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:50:31 - mmengine - INFO - Saving checkpoint at 44 epochs
+2023/07/09 11:50:41 - mmengine - INFO - Epoch(val)  [44][10/54]    memory: 4130  
+2023/07/09 11:50:50 - mmengine - INFO - Epoch(val)  [44][20/54]    memory: 1247  
+2023/07/09 11:50:59 - mmengine - INFO - Epoch(val)  [44][30/54]    memory: 1247  
+2023/07/09 11:51:08 - mmengine - INFO - Epoch(val)  [44][40/54]    memory: 1247  
+2023/07/09 11:51:17 - mmengine - INFO - Epoch(val)  [44][50/54]    memory: 1247  
+2023/07/09 11:51:20 - mmengine - INFO - Epoch(val) [44][54/54]    MAE: 0.0236  PSNR: 31.7993  SSIM: 0.8689  data_time: 0.0116  time: 0.8949
+2023/07/09 11:51:31 - mmengine - INFO - Epoch(train)  [45][10/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0543  loss: 0.0014  time: 0.8691
+2023/07/09 11:51:39 - mmengine - INFO - Epoch(train)  [45][20/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0540  loss: 0.0015  time: 0.8688
+2023/07/09 11:51:47 - mmengine - INFO - Epoch(train)  [45][30/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0540  loss: 0.0014  time: 0.8687
+2023/07/09 11:51:56 - mmengine - INFO - Epoch(train)  [45][40/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0539  loss: 0.0014  time: 0.8687
+2023/07/09 11:52:04 - mmengine - INFO - Epoch(train)  [45][50/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0277  loss: 0.0012  time: 0.8466
+2023/07/09 11:52:07 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:52:07 - mmengine - INFO - Saving checkpoint at 45 epochs
+2023/07/09 11:52:16 - mmengine - INFO - Epoch(val)  [45][10/54]    memory: 4130  
+2023/07/09 11:52:25 - mmengine - INFO - Epoch(val)  [45][20/54]    memory: 1247  
+2023/07/09 11:52:35 - mmengine - INFO - Epoch(val)  [45][30/54]    memory: 1247  
+2023/07/09 11:52:44 - mmengine - INFO - Epoch(val)  [45][40/54]    memory: 1247  
+2023/07/09 11:52:53 - mmengine - INFO - Epoch(val)  [45][50/54]    memory: 1247  
+2023/07/09 11:52:56 - mmengine - INFO - Epoch(val) [45][54/54]    MAE: 0.0205  PSNR: 33.0508  SSIM: 0.8708  data_time: 0.0117  time: 0.8927
+2023/07/09 11:53:07 - mmengine - INFO - Epoch(train)  [46][10/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0546  loss: 0.0010  time: 0.8692
+2023/07/09 11:53:15 - mmengine - INFO - Epoch(train)  [46][20/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0542  loss: 0.0009  time: 0.8688
+2023/07/09 11:53:24 - mmengine - INFO - Epoch(train)  [46][30/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0542  loss: 0.0009  time: 0.8689
+2023/07/09 11:53:32 - mmengine - INFO - Epoch(train)  [46][40/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0543  loss: 0.0008  time: 0.8691
+2023/07/09 11:53:40 - mmengine - INFO - Epoch(train)  [46][50/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0359  loss: 0.0008  time: 0.8547
+2023/07/09 11:53:43 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:53:43 - mmengine - INFO - Saving checkpoint at 46 epochs
+2023/07/09 11:53:52 - mmengine - INFO - Epoch(val)  [46][10/54]    memory: 4130  
+2023/07/09 11:54:02 - mmengine - INFO - Epoch(val)  [46][20/54]    memory: 1247  
+2023/07/09 11:54:11 - mmengine - INFO - Epoch(val)  [46][30/54]    memory: 1247  
+2023/07/09 11:54:20 - mmengine - INFO - Epoch(val)  [46][40/54]    memory: 1247  
+2023/07/09 11:54:29 - mmengine - INFO - Epoch(val)  [46][50/54]    memory: 1247  
+2023/07/09 11:54:32 - mmengine - INFO - Epoch(val) [46][54/54]    MAE: 0.0210  PSNR: 32.8444  SSIM: 0.8699  data_time: 0.0114  time: 0.8930
+2023/07/09 11:54:43 - mmengine - INFO - Epoch(train)  [47][10/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0625  loss: 0.0009  time: 0.8770
+2023/07/09 11:54:51 - mmengine - INFO - Epoch(train)  [47][20/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0621  loss: 0.0009  time: 0.8768
+2023/07/09 11:55:00 - mmengine - INFO - Epoch(train)  [47][30/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0622  loss: 0.0008  time: 0.8773
+2023/07/09 11:55:08 - mmengine - INFO - Epoch(train)  [47][40/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0623  loss: 0.0008  time: 0.8775
+2023/07/09 11:55:16 - mmengine - INFO - Epoch(train)  [47][50/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0360  loss: 0.0009  time: 0.8554
+2023/07/09 11:55:19 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:55:19 - mmengine - INFO - Saving checkpoint at 47 epochs
+2023/07/09 11:55:29 - mmengine - INFO - Epoch(val)  [47][10/54]    memory: 4130  
+2023/07/09 11:55:38 - mmengine - INFO - Epoch(val)  [47][20/54]    memory: 1247  
+2023/07/09 11:55:47 - mmengine - INFO - Epoch(val)  [47][30/54]    memory: 1247  
+2023/07/09 11:55:56 - mmengine - INFO - Epoch(val)  [47][40/54]    memory: 1247  
+2023/07/09 11:56:05 - mmengine - INFO - Epoch(val)  [47][50/54]    memory: 1247  
+2023/07/09 11:56:08 - mmengine - INFO - Epoch(val) [47][54/54]    MAE: 0.0194  PSNR: 33.5382  SSIM: 0.8709  data_time: 0.0119  time: 0.8943
+2023/07/09 11:56:08 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_18.pth is removed
+2023/07/09 11:56:08 - mmengine - INFO - The best checkpoint with 33.5382 PSNR at 47 epoch is saved to best_PSNR_epoch_47.pth.
+2023/07/09 11:56:20 - mmengine - INFO - Epoch(train)  [48][10/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0624  loss: 0.0009  time: 0.8775
+2023/07/09 11:56:28 - mmengine - INFO - Epoch(train)  [48][20/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0619  loss: 0.0009  time: 0.8769
+2023/07/09 11:56:36 - mmengine - INFO - Epoch(train)  [48][30/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0617  loss: 0.0009  time: 0.8768
+2023/07/09 11:56:45 - mmengine - INFO - Epoch(train)  [48][40/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0617  loss: 0.0008  time: 0.8768
+2023/07/09 11:56:53 - mmengine - INFO - Epoch(train)  [48][50/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0357  loss: 0.0008  time: 0.8551
+2023/07/09 11:56:56 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:56:56 - mmengine - INFO - Saving checkpoint at 48 epochs
+2023/07/09 11:57:05 - mmengine - INFO - Epoch(val)  [48][10/54]    memory: 4130  
+2023/07/09 11:57:14 - mmengine - INFO - Epoch(val)  [48][20/54]    memory: 1247  
+2023/07/09 11:57:24 - mmengine - INFO - Epoch(val)  [48][30/54]    memory: 1247  
+2023/07/09 11:57:33 - mmengine - INFO - Epoch(val)  [48][40/54]    memory: 1247  
+2023/07/09 11:57:42 - mmengine - INFO - Epoch(val)  [48][50/54]    memory: 1247  
+2023/07/09 11:57:45 - mmengine - INFO - Epoch(val) [48][54/54]    MAE: 0.0198  PSNR: 33.3125  SSIM: 0.8697  data_time: 0.0120  time: 0.8943
+2023/07/09 11:57:55 - mmengine - INFO - Epoch(train)  [49][10/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0546  loss: 0.0008  time: 0.8700
+2023/07/09 11:58:04 - mmengine - INFO - Epoch(train)  [49][20/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0542  loss: 0.0008  time: 0.8693
+2023/07/09 11:58:12 - mmengine - INFO - Epoch(train)  [49][30/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0542  loss: 0.0007  time: 0.8694
+2023/07/09 11:58:20 - mmengine - INFO - Epoch(train)  [49][40/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0543  loss: 0.0007  time: 0.8696
+2023/07/09 11:58:29 - mmengine - INFO - Epoch(train)  [49][50/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0280  loss: 0.0007  time: 0.8476
+2023/07/09 11:58:31 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 11:58:31 - mmengine - INFO - Saving checkpoint at 49 epochs
+2023/07/09 11:58:41 - mmengine - INFO - Epoch(val)  [49][10/54]    memory: 4130  
+2023/07/09 11:58:50 - mmengine - INFO - Epoch(val)  [49][20/54]    memory: 1247  
+2023/07/09 11:58:59 - mmengine - INFO - Epoch(val)  [49][30/54]    memory: 1247  
+2023/07/09 11:59:08 - mmengine - INFO - Epoch(val)  [49][40/54]    memory: 1247  
+2023/07/09 11:59:17 - mmengine - INFO - Epoch(val)  [49][50/54]    memory: 1247  
+2023/07/09 11:59:20 - mmengine - INFO - Epoch(val) [49][54/54]    MAE: 0.0195  PSNR: 33.4228  SSIM: 0.8701  data_time: 0.0120  time: 0.8951
+2023/07/09 11:59:32 - mmengine - INFO - Epoch(train)  [50][10/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0544  loss: 0.0007  time: 0.8700
+2023/07/09 11:59:40 - mmengine - INFO - Epoch(train)  [50][20/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0539  loss: 0.0007  time: 0.8694
+2023/07/09 11:59:48 - mmengine - INFO - Epoch(train)  [50][30/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0540  loss: 0.0007  time: 0.8694
+2023/07/09 11:59:56 - mmengine - INFO - Epoch(train)  [50][40/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0540  loss: 0.0007  time: 0.8694
+2023/07/09 12:00:05 - mmengine - INFO - Epoch(train)  [50][50/54]  lr: 9.6060e-05  memory: 4130  data_time: 0.0354  loss: 0.0007  time: 0.8549
+2023/07/09 12:00:08 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:00:08 - mmengine - INFO - Saving checkpoint at 50 epochs
+2023/07/09 12:00:17 - mmengine - INFO - Epoch(val)  [50][10/54]    memory: 4130  
+2023/07/09 12:00:26 - mmengine - INFO - Epoch(val)  [50][20/54]    memory: 1247  
+2023/07/09 12:00:35 - mmengine - INFO - Epoch(val)  [50][30/54]    memory: 1247  
+2023/07/09 12:00:45 - mmengine - INFO - Epoch(val)  [50][40/54]    memory: 1247  
+2023/07/09 12:00:54 - mmengine - INFO - Epoch(val)  [50][50/54]    memory: 1247  
+2023/07/09 12:00:57 - mmengine - INFO - Epoch(val) [50][54/54]    MAE: 0.0207  PSNR: 32.9259  SSIM: 0.8699  data_time: 0.0119  time: 0.8931
+2023/07/09 12:01:08 - mmengine - INFO - Epoch(train)  [51][10/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0619  loss: 0.0007  time: 0.8770
+2023/07/09 12:01:16 - mmengine - INFO - Epoch(train)  [51][20/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0615  loss: 0.0007  time: 0.8765
+2023/07/09 12:01:24 - mmengine - INFO - Epoch(train)  [51][30/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0615  loss: 0.0007  time: 0.8764
+2023/07/09 12:01:33 - mmengine - INFO - Epoch(train)  [51][40/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0616  loss: 0.0007  time: 0.8765
+2023/07/09 12:01:41 - mmengine - INFO - Epoch(train)  [51][50/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0356  loss: 0.0007  time: 0.8547
+2023/07/09 12:01:44 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:01:44 - mmengine - INFO - Saving checkpoint at 51 epochs
+2023/07/09 12:01:53 - mmengine - INFO - Epoch(val)  [51][10/54]    memory: 4130  
+2023/07/09 12:02:03 - mmengine - INFO - Epoch(val)  [51][20/54]    memory: 1247  
+2023/07/09 12:02:12 - mmengine - INFO - Epoch(val)  [51][30/54]    memory: 1247  
+2023/07/09 12:02:21 - mmengine - INFO - Epoch(val)  [51][40/54]    memory: 1247  
+2023/07/09 12:02:30 - mmengine - INFO - Epoch(val)  [51][50/54]    memory: 1247  
+2023/07/09 12:02:33 - mmengine - INFO - Epoch(val) [51][54/54]    MAE: 0.0198  PSNR: 33.2302  SSIM: 0.8709  data_time: 0.0113  time: 0.8934
+2023/07/09 12:02:43 - mmengine - INFO - Epoch(train)  [52][10/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0541  loss: 0.0007  time: 0.8691
+2023/07/09 12:02:52 - mmengine - INFO - Epoch(train)  [52][20/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0541  loss: 0.0007  time: 0.8692
+2023/07/09 12:03:00 - mmengine - INFO - Epoch(train)  [52][30/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0541  loss: 0.0007  time: 0.8693
+2023/07/09 12:03:08 - mmengine - INFO - Epoch(train)  [52][40/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0542  loss: 0.0007  time: 0.8695
+2023/07/09 12:03:17 - mmengine - INFO - Epoch(train)  [52][50/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0278  loss: 0.0007  time: 0.8473
+2023/07/09 12:03:19 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:03:19 - mmengine - INFO - Saving checkpoint at 52 epochs
+2023/07/09 12:03:29 - mmengine - INFO - Epoch(val)  [52][10/54]    memory: 4130  
+2023/07/09 12:03:38 - mmengine - INFO - Epoch(val)  [52][20/54]    memory: 1247  
+2023/07/09 12:03:47 - mmengine - INFO - Epoch(val)  [52][30/54]    memory: 1247  
+2023/07/09 12:03:56 - mmengine - INFO - Epoch(val)  [52][40/54]    memory: 1247  
+2023/07/09 12:04:05 - mmengine - INFO - Epoch(val)  [52][50/54]    memory: 1247  
+2023/07/09 12:04:08 - mmengine - INFO - Epoch(val) [52][54/54]    MAE: 0.0188  PSNR: 33.7448  SSIM: 0.8721  data_time: 0.0118  time: 0.8935
+2023/07/09 12:04:08 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_47.pth is removed
+2023/07/09 12:04:09 - mmengine - INFO - The best checkpoint with 33.7448 PSNR at 52 epoch is saved to best_PSNR_epoch_52.pth.
+2023/07/09 12:04:19 - mmengine - INFO - Epoch(train)  [53][10/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0472  loss: 0.0006  time: 0.8624
+2023/07/09 12:04:27 - mmengine - INFO - Epoch(train)  [53][20/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0470  loss: 0.0006  time: 0.8624
+2023/07/09 12:04:36 - mmengine - INFO - Epoch(train)  [53][30/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0470  loss: 0.0006  time: 0.8623
+2023/07/09 12:04:44 - mmengine - INFO - Epoch(train)  [53][40/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0470  loss: 0.0007  time: 0.8623
+2023/07/09 12:04:52 - mmengine - INFO - Epoch(train)  [53][50/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0285  loss: 0.0007  time: 0.8480
+2023/07/09 12:04:55 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:04:55 - mmengine - INFO - Saving checkpoint at 53 epochs
+2023/07/09 12:05:05 - mmengine - INFO - Epoch(val)  [53][10/54]    memory: 4130  
+2023/07/09 12:05:14 - mmengine - INFO - Epoch(val)  [53][20/54]    memory: 1247  
+2023/07/09 12:05:23 - mmengine - INFO - Epoch(val)  [53][30/54]    memory: 1247  
+2023/07/09 12:05:32 - mmengine - INFO - Epoch(val)  [53][40/54]    memory: 1247  
+2023/07/09 12:05:41 - mmengine - INFO - Epoch(val)  [53][50/54]    memory: 1247  
+2023/07/09 12:05:44 - mmengine - INFO - Epoch(val) [53][54/54]    MAE: 0.0200  PSNR: 33.2768  SSIM: 0.8718  data_time: 0.0114  time: 0.8928
+2023/07/09 12:05:55 - mmengine - INFO - Epoch(train)  [54][10/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0475  loss: 0.0007  time: 0.8627
+2023/07/09 12:06:03 - mmengine - INFO - Epoch(train)  [54][20/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0471  loss: 0.0007  time: 0.8621
+2023/07/09 12:06:11 - mmengine - INFO - Epoch(train)  [54][30/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0471  loss: 0.0007  time: 0.8621
+2023/07/09 12:06:20 - mmengine - INFO - Epoch(train)  [54][40/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0471  loss: 0.0007  time: 0.8622
+2023/07/09 12:06:28 - mmengine - INFO - Epoch(train)  [54][50/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0278  loss: 0.0007  time: 0.8471
+2023/07/09 12:06:31 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:06:31 - mmengine - INFO - Saving checkpoint at 54 epochs
+2023/07/09 12:06:40 - mmengine - INFO - Epoch(val)  [54][10/54]    memory: 4130  
+2023/07/09 12:06:49 - mmengine - INFO - Epoch(val)  [54][20/54]    memory: 1247  
+2023/07/09 12:06:58 - mmengine - INFO - Epoch(val)  [54][30/54]    memory: 1247  
+2023/07/09 12:07:08 - mmengine - INFO - Epoch(val)  [54][40/54]    memory: 1247  
+2023/07/09 12:07:17 - mmengine - INFO - Epoch(val)  [54][50/54]    memory: 1247  
+2023/07/09 12:07:20 - mmengine - INFO - Epoch(val) [54][54/54]    MAE: 0.0192  PSNR: 33.5205  SSIM: 0.8708  data_time: 0.0117  time: 0.8949
+2023/07/09 12:07:30 - mmengine - INFO - Epoch(train)  [55][10/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0463  loss: 0.0007  time: 0.8613
+2023/07/09 12:07:38 - mmengine - INFO - Epoch(train)  [55][20/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0462  loss: 0.0008  time: 0.8612
+2023/07/09 12:07:47 - mmengine - INFO - Epoch(train)  [55][30/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0462  loss: 0.0007  time: 0.8613
+2023/07/09 12:07:55 - mmengine - INFO - Epoch(train)  [55][40/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0462  loss: 0.0007  time: 0.8615
+2023/07/09 12:08:03 - mmengine - INFO - Epoch(train)  [55][50/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0278  loss: 0.0007  time: 0.8471
+2023/07/09 12:08:06 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:08:06 - mmengine - INFO - Saving checkpoint at 55 epochs
+2023/07/09 12:08:16 - mmengine - INFO - Epoch(val)  [55][10/54]    memory: 4130  
+2023/07/09 12:08:25 - mmengine - INFO - Epoch(val)  [55][20/54]    memory: 1247  
+2023/07/09 12:08:34 - mmengine - INFO - Epoch(val)  [55][30/54]    memory: 1247  
+2023/07/09 12:08:43 - mmengine - INFO - Epoch(val)  [55][40/54]    memory: 1247  
+2023/07/09 12:08:52 - mmengine - INFO - Epoch(val)  [55][50/54]    memory: 1247  
+2023/07/09 12:08:55 - mmengine - INFO - Epoch(val) [55][54/54]    MAE: 0.0179  PSNR: 34.0920  SSIM: 0.8717  data_time: 0.0116  time: 0.8931
+2023/07/09 12:08:55 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_52.pth is removed
+2023/07/09 12:08:55 - mmengine - INFO - The best checkpoint with 34.0920 PSNR at 55 epoch is saved to best_PSNR_epoch_55.pth.
+2023/07/09 12:09:07 - mmengine - INFO - Epoch(train)  [56][10/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0542  loss: 0.0007  time: 0.8692
+2023/07/09 12:09:15 - mmengine - INFO - Epoch(train)  [56][20/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0538  loss: 0.0006  time: 0.8686
+2023/07/09 12:09:23 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:09:23 - mmengine - INFO - Epoch(train)  [56][30/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0538  loss: 0.0006  time: 0.8686
+2023/07/09 12:09:32 - mmengine - INFO - Epoch(train)  [56][40/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0539  loss: 0.0006  time: 0.8687
+2023/07/09 12:09:40 - mmengine - INFO - Epoch(train)  [56][50/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0355  loss: 0.0006  time: 0.8545
+2023/07/09 12:09:43 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:09:43 - mmengine - INFO - Saving checkpoint at 56 epochs
+2023/07/09 12:09:52 - mmengine - INFO - Epoch(val)  [56][10/54]    memory: 4130  
+2023/07/09 12:10:01 - mmengine - INFO - Epoch(val)  [56][20/54]    memory: 1247  
+2023/07/09 12:10:11 - mmengine - INFO - Epoch(val)  [56][30/54]    memory: 1247  
+2023/07/09 12:10:20 - mmengine - INFO - Epoch(val)  [56][40/54]    memory: 1247  
+2023/07/09 12:10:29 - mmengine - INFO - Epoch(val)  [56][50/54]    memory: 1247  
+2023/07/09 12:10:32 - mmengine - INFO - Epoch(val) [56][54/54]    MAE: 0.0186  PSNR: 33.8830  SSIM: 0.8722  data_time: 0.0118  time: 0.8944
+2023/07/09 12:10:42 - mmengine - INFO - Epoch(train)  [57][10/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0542  loss: 0.0006  time: 0.8690
+2023/07/09 12:10:50 - mmengine - INFO - Epoch(train)  [57][20/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0540  loss: 0.0006  time: 0.8687
+2023/07/09 12:10:59 - mmengine - INFO - Epoch(train)  [57][30/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0540  loss: 0.0006  time: 0.8686
+2023/07/09 12:11:07 - mmengine - INFO - Epoch(train)  [57][40/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0540  loss: 0.0006  time: 0.8688
+2023/07/09 12:11:15 - mmengine - INFO - Epoch(train)  [57][50/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0278  loss: 0.0006  time: 0.8468
+2023/07/09 12:11:18 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:11:18 - mmengine - INFO - Saving checkpoint at 57 epochs
+2023/07/09 12:11:28 - mmengine - INFO - Epoch(val)  [57][10/54]    memory: 4130  
+2023/07/09 12:11:37 - mmengine - INFO - Epoch(val)  [57][20/54]    memory: 1247  
+2023/07/09 12:11:46 - mmengine - INFO - Epoch(val)  [57][30/54]    memory: 1247  
+2023/07/09 12:11:55 - mmengine - INFO - Epoch(val)  [57][40/54]    memory: 1247  
+2023/07/09 12:12:04 - mmengine - INFO - Epoch(val)  [57][50/54]    memory: 1247  
+2023/07/09 12:12:07 - mmengine - INFO - Epoch(val) [57][54/54]    MAE: 0.0179  PSNR: 34.0547  SSIM: 0.8717  data_time: 0.0118  time: 0.8941
+2023/07/09 12:12:18 - mmengine - INFO - Epoch(train)  [58][10/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0544  loss: 0.0006  time: 0.8689
+2023/07/09 12:12:27 - mmengine - INFO - Epoch(train)  [58][20/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0539  loss: 0.0006  time: 0.8685
+2023/07/09 12:12:35 - mmengine - INFO - Epoch(train)  [58][30/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0539  loss: 0.0006  time: 0.8685
+2023/07/09 12:12:43 - mmengine - INFO - Epoch(train)  [58][40/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0539  loss: 0.0006  time: 0.8687
+2023/07/09 12:12:52 - mmengine - INFO - Epoch(train)  [58][50/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0357  loss: 0.0006  time: 0.8545
+2023/07/09 12:12:54 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:12:54 - mmengine - INFO - Saving checkpoint at 58 epochs
+2023/07/09 12:13:04 - mmengine - INFO - Epoch(val)  [58][10/54]    memory: 4130  
+2023/07/09 12:13:13 - mmengine - INFO - Epoch(val)  [58][20/54]    memory: 1247  
+2023/07/09 12:13:22 - mmengine - INFO - Epoch(val)  [58][30/54]    memory: 1247  
+2023/07/09 12:13:31 - mmengine - INFO - Epoch(val)  [58][40/54]    memory: 1247  
+2023/07/09 12:13:40 - mmengine - INFO - Epoch(val)  [58][50/54]    memory: 1247  
+2023/07/09 12:13:43 - mmengine - INFO - Epoch(val) [58][54/54]    MAE: 0.0189  PSNR: 33.7290  SSIM: 0.8733  data_time: 0.0115  time: 0.8920
+2023/07/09 12:13:54 - mmengine - INFO - Epoch(train)  [59][10/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0557  loss: 0.0006  time: 0.8703
+2023/07/09 12:14:02 - mmengine - INFO - Epoch(train)  [59][20/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0553  loss: 0.0006  time: 0.8698
+2023/07/09 12:14:10 - mmengine - INFO - Epoch(train)  [59][30/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0553  loss: 0.0006  time: 0.8699
+2023/07/09 12:14:19 - mmengine - INFO - Epoch(train)  [59][40/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0554  loss: 0.0006  time: 0.8701
+2023/07/09 12:14:27 - mmengine - INFO - Epoch(train)  [59][50/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0292  loss: 0.0006  time: 0.8484
+2023/07/09 12:14:30 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:14:30 - mmengine - INFO - Saving checkpoint at 59 epochs
+2023/07/09 12:14:40 - mmengine - INFO - Epoch(val)  [59][10/54]    memory: 4130  
+2023/07/09 12:14:49 - mmengine - INFO - Epoch(val)  [59][20/54]    memory: 1247  
+2023/07/09 12:14:58 - mmengine - INFO - Epoch(val)  [59][30/54]    memory: 1247  
+2023/07/09 12:15:07 - mmengine - INFO - Epoch(val)  [59][40/54]    memory: 1247  
+2023/07/09 12:15:16 - mmengine - INFO - Epoch(val)  [59][50/54]    memory: 1247  
+2023/07/09 12:15:19 - mmengine - INFO - Epoch(val) [59][54/54]    MAE: 0.0177  PSNR: 34.2516  SSIM: 0.8727  data_time: 0.0120  time: 0.8967
+2023/07/09 12:15:19 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_55.pth is removed
+2023/07/09 12:15:19 - mmengine - INFO - The best checkpoint with 34.2516 PSNR at 59 epoch is saved to best_PSNR_epoch_59.pth.
+2023/07/09 12:15:30 - mmengine - INFO - Epoch(train)  [60][10/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0530  loss: 0.0006  time: 0.8679
+2023/07/09 12:15:39 - mmengine - INFO - Epoch(train)  [60][20/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0528  loss: 0.0005  time: 0.8678
+2023/07/09 12:15:47 - mmengine - INFO - Epoch(train)  [60][30/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0528  loss: 0.0005  time: 0.8678
+2023/07/09 12:15:55 - mmengine - INFO - Epoch(train)  [60][40/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0527  loss: 0.0005  time: 0.8678
+2023/07/09 12:16:04 - mmengine - INFO - Epoch(train)  [60][50/54]  lr: 9.5099e-05  memory: 4130  data_time: 0.0328  loss: 0.0005  time: 0.8520
+2023/07/09 12:16:06 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:16:06 - mmengine - INFO - Saving checkpoint at 60 epochs
+2023/07/09 12:16:16 - mmengine - INFO - Epoch(val)  [60][10/54]    memory: 4130  
+2023/07/09 12:16:25 - mmengine - INFO - Epoch(val)  [60][20/54]    memory: 1247  
+2023/07/09 12:16:34 - mmengine - INFO - Epoch(val)  [60][30/54]    memory: 1247  
+2023/07/09 12:16:43 - mmengine - INFO - Epoch(val)  [60][40/54]    memory: 1247  
+2023/07/09 12:16:53 - mmengine - INFO - Epoch(val)  [60][50/54]    memory: 1247  
+2023/07/09 12:16:56 - mmengine - INFO - Epoch(val) [60][54/54]    MAE: 0.0174  PSNR: 34.3317  SSIM: 0.8732  data_time: 0.0121  time: 0.8947
+2023/07/09 12:16:56 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_59.pth is removed
+2023/07/09 12:16:56 - mmengine - INFO - The best checkpoint with 34.3317 PSNR at 60 epoch is saved to best_PSNR_epoch_60.pth.
+2023/07/09 12:17:07 - mmengine - INFO - Epoch(train)  [61][10/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0596  loss: 0.0005  time: 0.8743
+2023/07/09 12:17:15 - mmengine - INFO - Epoch(train)  [61][20/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0592  loss: 0.0005  time: 0.8740
+2023/07/09 12:17:24 - mmengine - INFO - Epoch(train)  [61][30/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0592  loss: 0.0005  time: 0.8740
+2023/07/09 12:17:32 - mmengine - INFO - Epoch(train)  [61][40/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0593  loss: 0.0005  time: 0.8741
+2023/07/09 12:17:40 - mmengine - INFO - Epoch(train)  [61][50/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0357  loss: 0.0005  time: 0.8546
+2023/07/09 12:17:43 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:17:43 - mmengine - INFO - Saving checkpoint at 61 epochs
+2023/07/09 12:17:53 - mmengine - INFO - Epoch(val)  [61][10/54]    memory: 4130  
+2023/07/09 12:18:02 - mmengine - INFO - Epoch(val)  [61][20/54]    memory: 1247  
+2023/07/09 12:18:11 - mmengine - INFO - Epoch(val)  [61][30/54]    memory: 1247  
+2023/07/09 12:18:20 - mmengine - INFO - Epoch(val)  [61][40/54]    memory: 1247  
+2023/07/09 12:18:29 - mmengine - INFO - Epoch(val)  [61][50/54]    memory: 1247  
+2023/07/09 12:18:32 - mmengine - INFO - Epoch(val) [61][54/54]    MAE: 0.0190  PSNR: 33.7932  SSIM: 0.8735  data_time: 0.0115  time: 0.8945
+2023/07/09 12:18:43 - mmengine - INFO - Epoch(train)  [62][10/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0547  loss: 0.0005  time: 0.8696
+2023/07/09 12:18:51 - mmengine - INFO - Epoch(train)  [62][20/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0543  loss: 0.0005  time: 0.8692
+2023/07/09 12:18:59 - mmengine - INFO - Epoch(train)  [62][30/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0543  loss: 0.0005  time: 0.8693
+2023/07/09 12:19:08 - mmengine - INFO - Epoch(train)  [62][40/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0544  loss: 0.0005  time: 0.8695
+2023/07/09 12:19:16 - mmengine - INFO - Epoch(train)  [62][50/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0280  loss: 0.0005  time: 0.8475
+2023/07/09 12:19:19 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:19:19 - mmengine - INFO - Saving checkpoint at 62 epochs
+2023/07/09 12:19:28 - mmengine - INFO - Epoch(val)  [62][10/54]    memory: 4130  
+2023/07/09 12:19:37 - mmengine - INFO - Epoch(val)  [62][20/54]    memory: 1247  
+2023/07/09 12:19:46 - mmengine - INFO - Epoch(val)  [62][30/54]    memory: 1247  
+2023/07/09 12:19:56 - mmengine - INFO - Epoch(val)  [62][40/54]    memory: 1247  
+2023/07/09 12:20:05 - mmengine - INFO - Epoch(val)  [62][50/54]    memory: 1247  
+2023/07/09 12:20:08 - mmengine - INFO - Epoch(val) [62][54/54]    MAE: 0.0178  PSNR: 34.2195  SSIM: 0.8728  data_time: 0.0117  time: 0.8948
+2023/07/09 12:20:19 - mmengine - INFO - Epoch(train)  [63][10/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0510  loss: 0.0005  time: 0.8664
+2023/07/09 12:20:27 - mmengine - INFO - Epoch(train)  [63][20/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0507  loss: 0.0005  time: 0.8662
+2023/07/09 12:20:35 - mmengine - INFO - Epoch(train)  [63][30/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0507  loss: 0.0005  time: 0.8662
+2023/07/09 12:20:44 - mmengine - INFO - Epoch(train)  [63][40/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0508  loss: 0.0005  time: 0.8666
+2023/07/09 12:20:52 - mmengine - INFO - Epoch(train)  [63][50/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0323  loss: 0.0005  time: 0.8522
+2023/07/09 12:20:55 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:20:55 - mmengine - INFO - Saving checkpoint at 63 epochs
+2023/07/09 12:21:04 - mmengine - INFO - Epoch(val)  [63][10/54]    memory: 4130  
+2023/07/09 12:21:13 - mmengine - INFO - Epoch(val)  [63][20/54]    memory: 1247  
+2023/07/09 12:21:22 - mmengine - INFO - Epoch(val)  [63][30/54]    memory: 1247  
+2023/07/09 12:21:32 - mmengine - INFO - Epoch(val)  [63][40/54]    memory: 1247  
+2023/07/09 12:21:41 - mmengine - INFO - Epoch(val)  [63][50/54]    memory: 1247  
+2023/07/09 12:21:44 - mmengine - INFO - Epoch(val) [63][54/54]    MAE: 0.0173  PSNR: 34.3997  SSIM: 0.8731  data_time: 0.0115  time: 0.8935
+2023/07/09 12:21:44 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_60.pth is removed
+2023/07/09 12:21:44 - mmengine - INFO - The best checkpoint with 34.3997 PSNR at 63 epoch is saved to best_PSNR_epoch_63.pth.
+2023/07/09 12:21:55 - mmengine - INFO - Epoch(train)  [64][10/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0587  loss: 0.0005  time: 0.8741
+2023/07/09 12:22:04 - mmengine - INFO - Epoch(train)  [64][20/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0585  loss: 0.0005  time: 0.8738
+2023/07/09 12:22:12 - mmengine - INFO - Epoch(train)  [64][30/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0586  loss: 0.0005  time: 0.8739
+2023/07/09 12:22:20 - mmengine - INFO - Epoch(train)  [64][40/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0585  loss: 0.0005  time: 0.8740
+2023/07/09 12:22:29 - mmengine - INFO - Epoch(train)  [64][50/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0358  loss: 0.0005  time: 0.8555
+2023/07/09 12:22:31 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:22:31 - mmengine - INFO - Saving checkpoint at 64 epochs
+2023/07/09 12:22:41 - mmengine - INFO - Epoch(val)  [64][10/54]    memory: 4130  
+2023/07/09 12:22:50 - mmengine - INFO - Epoch(val)  [64][20/54]    memory: 1247  
+2023/07/09 12:22:59 - mmengine - INFO - Epoch(val)  [64][30/54]    memory: 1247  
+2023/07/09 12:23:08 - mmengine - INFO - Epoch(val)  [64][40/54]    memory: 1247  
+2023/07/09 12:23:17 - mmengine - INFO - Epoch(val)  [64][50/54]    memory: 1247  
+2023/07/09 12:23:21 - mmengine - INFO - Epoch(val) [64][54/54]    MAE: 0.0179  PSNR: 34.2329  SSIM: 0.8732  data_time: 0.0121  time: 0.8959
+2023/07/09 12:23:31 - mmengine - INFO - Epoch(train)  [65][10/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0557  loss: 0.0005  time: 0.8711
+2023/07/09 12:23:39 - mmengine - INFO - Epoch(train)  [65][20/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0556  loss: 0.0005  time: 0.8710
+2023/07/09 12:23:48 - mmengine - INFO - Epoch(train)  [65][30/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0556  loss: 0.0005  time: 0.8709
+2023/07/09 12:23:56 - mmengine - INFO - Epoch(train)  [65][40/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0556  loss: 0.0005  time: 0.8710
+2023/07/09 12:24:04 - mmengine - INFO - Epoch(train)  [65][50/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0292  loss: 0.0005  time: 0.8491
+2023/07/09 12:24:07 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:24:07 - mmengine - INFO - Saving checkpoint at 65 epochs
+2023/07/09 12:24:17 - mmengine - INFO - Epoch(val)  [65][10/54]    memory: 4130  
+2023/07/09 12:24:26 - mmengine - INFO - Epoch(val)  [65][20/54]    memory: 1247  
+2023/07/09 12:24:35 - mmengine - INFO - Epoch(val)  [65][30/54]    memory: 1247  
+2023/07/09 12:24:44 - mmengine - INFO - Epoch(val)  [65][40/54]    memory: 1247  
+2023/07/09 12:24:53 - mmengine - INFO - Epoch(val)  [65][50/54]    memory: 1247  
+2023/07/09 12:24:56 - mmengine - INFO - Epoch(val) [65][54/54]    MAE: 0.0178  PSNR: 34.2453  SSIM: 0.8743  data_time: 0.0118  time: 0.8953
+2023/07/09 12:25:07 - mmengine - INFO - Epoch(train)  [66][10/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0559  loss: 0.0005  time: 0.8713
+2023/07/09 12:25:16 - mmengine - INFO - Epoch(train)  [66][20/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0554  loss: 0.0005  time: 0.8708
+2023/07/09 12:25:24 - mmengine - INFO - Epoch(train)  [66][30/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0554  loss: 0.0005  time: 0.8706
+2023/07/09 12:25:32 - mmengine - INFO - Epoch(train)  [66][40/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0555  loss: 0.0005  time: 0.8707
+2023/07/09 12:25:41 - mmengine - INFO - Epoch(train)  [66][50/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0358  loss: 0.0004  time: 0.8553
+2023/07/09 12:25:43 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:25:43 - mmengine - INFO - Saving checkpoint at 66 epochs
+2023/07/09 12:25:53 - mmengine - INFO - Epoch(val)  [66][10/54]    memory: 4130  
+2023/07/09 12:26:02 - mmengine - INFO - Epoch(val)  [66][20/54]    memory: 1247  
+2023/07/09 12:26:11 - mmengine - INFO - Epoch(val)  [66][30/54]    memory: 1247  
+2023/07/09 12:26:20 - mmengine - INFO - Epoch(val)  [66][40/54]    memory: 1247  
+2023/07/09 12:26:29 - mmengine - INFO - Epoch(val)  [66][50/54]    memory: 1247  
+2023/07/09 12:26:32 - mmengine - INFO - Epoch(val) [66][54/54]    MAE: 0.0178  PSNR: 34.3014  SSIM: 0.8743  data_time: 0.0119  time: 0.8940
+2023/07/09 12:26:43 - mmengine - INFO - Epoch(train)  [67][10/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0622  loss: 0.0004  time: 0.8773
+2023/07/09 12:26:52 - mmengine - INFO - Epoch(train)  [67][20/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0619  loss: 0.0004  time: 0.8770
+2023/07/09 12:27:00 - mmengine - INFO - Epoch(train)  [67][30/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0619  loss: 0.0004  time: 0.8770
+2023/07/09 12:27:08 - mmengine - INFO - Epoch(train)  [67][40/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0620  loss: 0.0004  time: 0.8772
+2023/07/09 12:27:17 - mmengine - INFO - Epoch(train)  [67][50/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0357  loss: 0.0004  time: 0.8553
+2023/07/09 12:27:20 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:27:20 - mmengine - INFO - Saving checkpoint at 67 epochs
+2023/07/09 12:27:29 - mmengine - INFO - Epoch(val)  [67][10/54]    memory: 4130  
+2023/07/09 12:27:38 - mmengine - INFO - Epoch(val)  [67][20/54]    memory: 1247  
+2023/07/09 12:27:47 - mmengine - INFO - Epoch(val)  [67][30/54]    memory: 1247  
+2023/07/09 12:27:57 - mmengine - INFO - Epoch(val)  [67][40/54]    memory: 1247  
+2023/07/09 12:28:06 - mmengine - INFO - Epoch(val)  [67][50/54]    memory: 1247  
+2023/07/09 12:28:09 - mmengine - INFO - Epoch(val) [67][54/54]    MAE: 0.0183  PSNR: 33.9836  SSIM: 0.8745  data_time: 0.0120  time: 0.8960
+2023/07/09 12:28:19 - mmengine - INFO - Epoch(train)  [68][10/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0543  loss: 0.0004  time: 0.8696
+2023/07/09 12:28:27 - mmengine - INFO - Epoch(train)  [68][20/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0542  loss: 0.0004  time: 0.8696
+2023/07/09 12:28:36 - mmengine - INFO - Epoch(train)  [68][30/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0542  loss: 0.0004  time: 0.8697
+2023/07/09 12:28:44 - mmengine - INFO - Epoch(train)  [68][40/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0542  loss: 0.0004  time: 0.8699
+2023/07/09 12:28:52 - mmengine - INFO - Epoch(train)  [68][50/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0281  loss: 0.0004  time: 0.8481
+2023/07/09 12:28:55 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:28:55 - mmengine - INFO - Saving checkpoint at 68 epochs
+2023/07/09 12:29:05 - mmengine - INFO - Epoch(val)  [68][10/54]    memory: 4130  
+2023/07/09 12:29:14 - mmengine - INFO - Epoch(val)  [68][20/54]    memory: 1247  
+2023/07/09 12:29:23 - mmengine - INFO - Epoch(val)  [68][30/54]    memory: 1247  
+2023/07/09 12:29:32 - mmengine - INFO - Epoch(val)  [68][40/54]    memory: 1247  
+2023/07/09 12:29:41 - mmengine - INFO - Epoch(val)  [68][50/54]    memory: 1247  
+2023/07/09 12:29:45 - mmengine - INFO - Epoch(val) [68][54/54]    MAE: 0.0179  PSNR: 34.1741  SSIM: 0.8742  data_time: 0.0117  time: 0.8953
+2023/07/09 12:29:56 - mmengine - INFO - Epoch(train)  [69][10/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0546  loss: 0.0004  time: 0.8707
+2023/07/09 12:30:04 - mmengine - INFO - Epoch(train)  [69][20/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0543  loss: 0.0004  time: 0.8703
+2023/07/09 12:30:12 - mmengine - INFO - Epoch(train)  [69][30/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0542  loss: 0.0004  time: 0.8702
+2023/07/09 12:30:21 - mmengine - INFO - Epoch(train)  [69][40/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0542  loss: 0.0004  time: 0.8702
+2023/07/09 12:30:29 - mmengine - INFO - Epoch(train)  [69][50/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0358  loss: 0.0004  time: 0.8561
+2023/07/09 12:30:32 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:30:32 - mmengine - INFO - Saving checkpoint at 69 epochs
+2023/07/09 12:30:41 - mmengine - INFO - Epoch(val)  [69][10/54]    memory: 4130  
+2023/07/09 12:30:50 - mmengine - INFO - Epoch(val)  [69][20/54]    memory: 1247  
+2023/07/09 12:31:00 - mmengine - INFO - Epoch(val)  [69][30/54]    memory: 1247  
+2023/07/09 12:31:09 - mmengine - INFO - Epoch(val)  [69][40/54]    memory: 1247  
+2023/07/09 12:31:18 - mmengine - INFO - Epoch(val)  [69][50/54]    memory: 1247  
+2023/07/09 12:31:21 - mmengine - INFO - Epoch(val) [69][54/54]    MAE: 0.0175  PSNR: 34.4651  SSIM: 0.8751  data_time: 0.0113  time: 0.8951
+2023/07/09 12:31:21 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_63.pth is removed
+2023/07/09 12:31:21 - mmengine - INFO - The best checkpoint with 34.4651 PSNR at 69 epoch is saved to best_PSNR_epoch_69.pth.
+2023/07/09 12:31:32 - mmengine - INFO - Epoch(train)  [70][10/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0581  loss: 0.0004  time: 0.8737
+2023/07/09 12:31:40 - mmengine - INFO - Epoch(train)  [70][20/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0575  loss: 0.0004  time: 0.8732
+2023/07/09 12:31:48 - mmengine - INFO - Epoch(train)  [70][30/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0575  loss: 0.0004  time: 0.8728
+2023/07/09 12:31:57 - mmengine - INFO - Epoch(train)  [70][40/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0574  loss: 0.0004  time: 0.8729
+2023/07/09 12:32:05 - mmengine - INFO - Epoch(train)  [70][50/54]  lr: 9.4148e-05  memory: 4130  data_time: 0.0311  loss: 0.0004  time: 0.8502
+2023/07/09 12:32:08 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:32:08 - mmengine - INFO - Saving checkpoint at 70 epochs
+2023/07/09 12:32:17 - mmengine - INFO - Epoch(val)  [70][10/54]    memory: 4130  
+2023/07/09 12:32:27 - mmengine - INFO - Epoch(val)  [70][20/54]    memory: 1247  
+2023/07/09 12:32:36 - mmengine - INFO - Epoch(val)  [70][30/54]    memory: 1247  
+2023/07/09 12:32:45 - mmengine - INFO - Epoch(val)  [70][40/54]    memory: 1247  
+2023/07/09 12:32:54 - mmengine - INFO - Epoch(val)  [70][50/54]    memory: 1247  
+2023/07/09 12:32:57 - mmengine - INFO - Epoch(val) [70][54/54]    MAE: 0.0175  PSNR: 34.4398  SSIM: 0.8754  data_time: 0.0117  time: 0.8940
+2023/07/09 12:33:08 - mmengine - INFO - Epoch(train)  [71][10/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0578  loss: 0.0004  time: 0.8724
+2023/07/09 12:33:16 - mmengine - INFO - Epoch(train)  [71][20/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0574  loss: 0.0004  time: 0.8720
+2023/07/09 12:33:25 - mmengine - INFO - Epoch(train)  [71][30/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0574  loss: 0.0004  time: 0.8720
+2023/07/09 12:33:33 - mmengine - INFO - Epoch(train)  [71][40/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0574  loss: 0.0005  time: 0.8720
+2023/07/09 12:33:41 - mmengine - INFO - Epoch(train)  [71][50/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0356  loss: 0.0005  time: 0.8548
+2023/07/09 12:33:44 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:33:44 - mmengine - INFO - Saving checkpoint at 71 epochs
+2023/07/09 12:33:54 - mmengine - INFO - Epoch(val)  [71][10/54]    memory: 4130  
+2023/07/09 12:34:03 - mmengine - INFO - Epoch(val)  [71][20/54]    memory: 1247  
+2023/07/09 12:34:12 - mmengine - INFO - Epoch(val)  [71][30/54]    memory: 1247  
+2023/07/09 12:34:21 - mmengine - INFO - Epoch(val)  [71][40/54]    memory: 1247  
+2023/07/09 12:34:30 - mmengine - INFO - Epoch(val)  [71][50/54]    memory: 1247  
+2023/07/09 12:34:33 - mmengine - INFO - Epoch(val) [71][54/54]    MAE: 0.0171  PSNR: 34.5240  SSIM: 0.8751  data_time: 0.0117  time: 0.8943
+2023/07/09 12:34:33 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_69.pth is removed
+2023/07/09 12:34:33 - mmengine - INFO - The best checkpoint with 34.5240 PSNR at 71 epoch is saved to best_PSNR_epoch_71.pth.
+2023/07/09 12:34:44 - mmengine - INFO - Epoch(train)  [72][10/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0542  loss: 0.0005  time: 0.8691
+2023/07/09 12:34:52 - mmengine - INFO - Epoch(train)  [72][20/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0542  loss: 0.0005  time: 0.8691
+2023/07/09 12:35:01 - mmengine - INFO - Epoch(train)  [72][30/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0542  loss: 0.0005  time: 0.8691
+2023/07/09 12:35:09 - mmengine - INFO - Epoch(train)  [72][40/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0543  loss: 0.0005  time: 0.8693
+2023/07/09 12:35:17 - mmengine - INFO - Epoch(train)  [72][50/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0281  loss: 0.0005  time: 0.8476
+2023/07/09 12:35:20 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:35:20 - mmengine - INFO - Saving checkpoint at 72 epochs
+2023/07/09 12:35:30 - mmengine - INFO - Epoch(val)  [72][10/54]    memory: 4130  
+2023/07/09 12:35:39 - mmengine - INFO - Epoch(val)  [72][20/54]    memory: 1247  
+2023/07/09 12:35:48 - mmengine - INFO - Epoch(val)  [72][30/54]    memory: 1247  
+2023/07/09 12:35:57 - mmengine - INFO - Epoch(val)  [72][40/54]    memory: 1247  
+2023/07/09 12:36:06 - mmengine - INFO - Epoch(val)  [72][50/54]    memory: 1247  
+2023/07/09 12:36:09 - mmengine - INFO - Epoch(val) [72][54/54]    MAE: 0.0197  PSNR: 33.4133  SSIM: 0.8747  data_time: 0.0116  time: 0.8967
+2023/07/09 12:36:20 - mmengine - INFO - Epoch(train)  [73][10/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0548  loss: 0.0005  time: 0.8698
+2023/07/09 12:36:29 - mmengine - INFO - Epoch(train)  [73][20/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0543  loss: 0.0005  time: 0.8693
+2023/07/09 12:36:37 - mmengine - INFO - Epoch(train)  [73][30/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0543  loss: 0.0005  time: 0.8692
+2023/07/09 12:36:45 - mmengine - INFO - Epoch(train)  [73][40/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0543  loss: 0.0005  time: 0.8693
+2023/07/09 12:36:54 - mmengine - INFO - Epoch(train)  [73][50/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0359  loss: 0.0005  time: 0.8552
+2023/07/09 12:36:56 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:36:56 - mmengine - INFO - Saving checkpoint at 73 epochs
+2023/07/09 12:37:06 - mmengine - INFO - Epoch(val)  [73][10/54]    memory: 4130  
+2023/07/09 12:37:15 - mmengine - INFO - Epoch(val)  [73][20/54]    memory: 1247  
+2023/07/09 12:37:24 - mmengine - INFO - Epoch(val)  [73][30/54]    memory: 1247  
+2023/07/09 12:37:33 - mmengine - INFO - Epoch(val)  [73][40/54]    memory: 1247  
+2023/07/09 12:37:43 - mmengine - INFO - Epoch(val)  [73][50/54]    memory: 1247  
+2023/07/09 12:37:46 - mmengine - INFO - Epoch(val) [73][54/54]    MAE: 0.0175  PSNR: 34.4173  SSIM: 0.8752  data_time: 0.0117  time: 0.8953
+2023/07/09 12:37:57 - mmengine - INFO - Epoch(train)  [74][10/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0625  loss: 0.0004  time: 0.8778
+2023/07/09 12:38:05 - mmengine - INFO - Epoch(train)  [74][20/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0621  loss: 0.0004  time: 0.8774
+2023/07/09 12:38:13 - mmengine - INFO - Epoch(train)  [74][30/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0621  loss: 0.0004  time: 0.8773
+2023/07/09 12:38:22 - mmengine - INFO - Epoch(train)  [74][40/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0621  loss: 0.0004  time: 0.8774
+2023/07/09 12:38:30 - mmengine - INFO - Epoch(train)  [74][50/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0357  loss: 0.0004  time: 0.8554
+2023/07/09 12:38:33 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:38:33 - mmengine - INFO - Saving checkpoint at 74 epochs
+2023/07/09 12:38:42 - mmengine - INFO - Epoch(val)  [74][10/54]    memory: 4130  
+2023/07/09 12:38:52 - mmengine - INFO - Epoch(val)  [74][20/54]    memory: 1247  
+2023/07/09 12:39:01 - mmengine - INFO - Epoch(val)  [74][30/54]    memory: 1247  
+2023/07/09 12:39:10 - mmengine - INFO - Epoch(val)  [74][40/54]    memory: 1247  
+2023/07/09 12:39:19 - mmengine - INFO - Epoch(val)  [74][50/54]    memory: 1247  
+2023/07/09 12:39:22 - mmengine - INFO - Epoch(val) [74][54/54]    MAE: 0.0178  PSNR: 34.3088  SSIM: 0.8753  data_time: 0.0118  time: 0.8954
+2023/07/09 12:39:27 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:39:32 - mmengine - INFO - Epoch(train)  [75][10/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0542  loss: 0.0004  time: 0.8700
+2023/07/09 12:39:41 - mmengine - INFO - Epoch(train)  [75][20/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0542  loss: 0.0004  time: 0.8701
+2023/07/09 12:39:49 - mmengine - INFO - Epoch(train)  [75][30/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0542  loss: 0.0004  time: 0.8703
+2023/07/09 12:39:57 - mmengine - INFO - Epoch(train)  [75][40/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0542  loss: 0.0004  time: 0.8705
+2023/07/09 12:40:06 - mmengine - INFO - Epoch(train)  [75][50/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0280  loss: 0.0004  time: 0.8482
+2023/07/09 12:40:09 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:40:09 - mmengine - INFO - Saving checkpoint at 75 epochs
+2023/07/09 12:40:18 - mmengine - INFO - Epoch(val)  [75][10/54]    memory: 4130  
+2023/07/09 12:40:27 - mmengine - INFO - Epoch(val)  [75][20/54]    memory: 1247  
+2023/07/09 12:40:36 - mmengine - INFO - Epoch(val)  [75][30/54]    memory: 1247  
+2023/07/09 12:40:46 - mmengine - INFO - Epoch(val)  [75][40/54]    memory: 1247  
+2023/07/09 12:40:55 - mmengine - INFO - Epoch(val)  [75][50/54]    memory: 1247  
+2023/07/09 12:40:58 - mmengine - INFO - Epoch(val) [75][54/54]    MAE: 0.0188  PSNR: 33.8973  SSIM: 0.8751  data_time: 0.0120  time: 0.8958
+2023/07/09 12:41:09 - mmengine - INFO - Epoch(train)  [76][10/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0546  loss: 0.0004  time: 0.8706
+2023/07/09 12:41:17 - mmengine - INFO - Epoch(train)  [76][20/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0543  loss: 0.0004  time: 0.8705
+2023/07/09 12:41:25 - mmengine - INFO - Epoch(train)  [76][30/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0543  loss: 0.0005  time: 0.8705
+2023/07/09 12:41:34 - mmengine - INFO - Epoch(train)  [76][40/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0544  loss: 0.0005  time: 0.8707
+2023/07/09 12:41:42 - mmengine - INFO - Epoch(train)  [76][50/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0360  loss: 0.0005  time: 0.8565
+2023/07/09 12:41:45 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:41:45 - mmengine - INFO - Saving checkpoint at 76 epochs
+2023/07/09 12:41:54 - mmengine - INFO - Epoch(val)  [76][10/54]    memory: 4130  
+2023/07/09 12:42:04 - mmengine - INFO - Epoch(val)  [76][20/54]    memory: 1247  
+2023/07/09 12:42:13 - mmengine - INFO - Epoch(val)  [76][30/54]    memory: 1247  
+2023/07/09 12:42:22 - mmengine - INFO - Epoch(val)  [76][40/54]    memory: 1247  
+2023/07/09 12:42:31 - mmengine - INFO - Epoch(val)  [76][50/54]    memory: 1247  
+2023/07/09 12:42:34 - mmengine - INFO - Epoch(val) [76][54/54]    MAE: 0.0182  PSNR: 34.0680  SSIM: 0.8758  data_time: 0.0116  time: 0.8954
+2023/07/09 12:42:45 - mmengine - INFO - Epoch(train)  [77][10/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0625  loss: 0.0005  time: 0.8784
+2023/07/09 12:42:53 - mmengine - INFO - Epoch(train)  [77][20/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0621  loss: 0.0005  time: 0.8779
+2023/07/09 12:43:02 - mmengine - INFO - Epoch(train)  [77][30/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0621  loss: 0.0005  time: 0.8779
+2023/07/09 12:43:10 - mmengine - INFO - Epoch(train)  [77][40/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0622  loss: 0.0005  time: 0.8780
+2023/07/09 12:43:18 - mmengine - INFO - Epoch(train)  [77][50/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0358  loss: 0.0005  time: 0.8557
+2023/07/09 12:43:21 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:43:21 - mmengine - INFO - Saving checkpoint at 77 epochs
+2023/07/09 12:43:31 - mmengine - INFO - Epoch(val)  [77][10/54]    memory: 4130  
+2023/07/09 12:43:40 - mmengine - INFO - Epoch(val)  [77][20/54]    memory: 1247  
+2023/07/09 12:43:49 - mmengine - INFO - Epoch(val)  [77][30/54]    memory: 1247  
+2023/07/09 12:43:58 - mmengine - INFO - Epoch(val)  [77][40/54]    memory: 1247  
+2023/07/09 12:44:07 - mmengine - INFO - Epoch(val)  [77][50/54]    memory: 1247  
+2023/07/09 12:44:11 - mmengine - INFO - Epoch(val) [77][54/54]    MAE: 0.0175  PSNR: 34.4728  SSIM: 0.8765  data_time: 0.0119  time: 0.8950
+2023/07/09 12:44:21 - mmengine - INFO - Epoch(train)  [78][10/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0544  loss: 0.0005  time: 0.8701
+2023/07/09 12:44:29 - mmengine - INFO - Epoch(train)  [78][20/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0541  loss: 0.0005  time: 0.8698
+2023/07/09 12:44:37 - mmengine - INFO - Epoch(train)  [78][30/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0540  loss: 0.0004  time: 0.8697
+2023/07/09 12:44:46 - mmengine - INFO - Epoch(train)  [78][40/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0541  loss: 0.0004  time: 0.8698
+2023/07/09 12:44:54 - mmengine - INFO - Epoch(train)  [78][50/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0279  loss: 0.0004  time: 0.8480
+2023/07/09 12:44:57 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:44:57 - mmengine - INFO - Saving checkpoint at 78 epochs
+2023/07/09 12:45:06 - mmengine - INFO - Epoch(val)  [78][10/54]    memory: 4130  
+2023/07/09 12:45:16 - mmengine - INFO - Epoch(val)  [78][20/54]    memory: 1247  
+2023/07/09 12:45:25 - mmengine - INFO - Epoch(val)  [78][30/54]    memory: 1247  
+2023/07/09 12:45:34 - mmengine - INFO - Epoch(val)  [78][40/54]    memory: 1247  
+2023/07/09 12:45:43 - mmengine - INFO - Epoch(val)  [78][50/54]    memory: 1247  
+2023/07/09 12:45:46 - mmengine - INFO - Epoch(val) [78][54/54]    MAE: 0.0179  PSNR: 34.2775  SSIM: 0.8758  data_time: 0.0121  time: 0.8961
+2023/07/09 12:45:56 - mmengine - INFO - Epoch(train)  [79][10/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0466  loss: 0.0004  time: 0.8626
+2023/07/09 12:46:05 - mmengine - INFO - Epoch(train)  [79][20/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0464  loss: 0.0004  time: 0.8623
+2023/07/09 12:46:13 - mmengine - INFO - Epoch(train)  [79][30/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0465  loss: 0.0004  time: 0.8624
+2023/07/09 12:46:21 - mmengine - INFO - Epoch(train)  [79][40/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0465  loss: 0.0005  time: 0.8627
+2023/07/09 12:46:30 - mmengine - INFO - Epoch(train)  [79][50/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0280  loss: 0.0005  time: 0.8484
+2023/07/09 12:46:33 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:46:33 - mmengine - INFO - Saving checkpoint at 79 epochs
+2023/07/09 12:46:42 - mmengine - INFO - Epoch(val)  [79][10/54]    memory: 4130  
+2023/07/09 12:46:51 - mmengine - INFO - Epoch(val)  [79][20/54]    memory: 1247  
+2023/07/09 12:47:00 - mmengine - INFO - Epoch(val)  [79][30/54]    memory: 1247  
+2023/07/09 12:47:09 - mmengine - INFO - Epoch(val)  [79][40/54]    memory: 1247  
+2023/07/09 12:47:19 - mmengine - INFO - Epoch(val)  [79][50/54]    memory: 1247  
+2023/07/09 12:47:22 - mmengine - INFO - Epoch(val) [79][54/54]    MAE: 0.0180  PSNR: 34.2217  SSIM: 0.8765  data_time: 0.0117  time: 0.8937
+2023/07/09 12:47:33 - mmengine - INFO - Epoch(train)  [80][10/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0550  loss: 0.0005  time: 0.8709
+2023/07/09 12:47:41 - mmengine - INFO - Epoch(train)  [80][20/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0545  loss: 0.0005  time: 0.8705
+2023/07/09 12:47:49 - mmengine - INFO - Epoch(train)  [80][30/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0545  loss: 0.0005  time: 0.8705
+2023/07/09 12:47:58 - mmengine - INFO - Epoch(train)  [80][40/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0546  loss: 0.0005  time: 0.8706
+2023/07/09 12:48:06 - mmengine - INFO - Epoch(train)  [80][50/54]  lr: 9.3207e-05  memory: 4130  data_time: 0.0359  loss: 0.0005  time: 0.8561
+2023/07/09 12:48:09 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:48:09 - mmengine - INFO - Saving checkpoint at 80 epochs
+2023/07/09 12:48:18 - mmengine - INFO - Epoch(val)  [80][10/54]    memory: 4130  
+2023/07/09 12:48:27 - mmengine - INFO - Epoch(val)  [80][20/54]    memory: 1247  
+2023/07/09 12:48:37 - mmengine - INFO - Epoch(val)  [80][30/54]    memory: 1247  
+2023/07/09 12:48:46 - mmengine - INFO - Epoch(val)  [80][40/54]    memory: 1247  
+2023/07/09 12:48:55 - mmengine - INFO - Epoch(val)  [80][50/54]    memory: 1247  
+2023/07/09 12:48:58 - mmengine - INFO - Epoch(val) [80][54/54]    MAE: 0.0177  PSNR: 34.3586  SSIM: 0.8765  data_time: 0.0118  time: 0.8935
+2023/07/09 12:49:09 - mmengine - INFO - Epoch(train)  [81][10/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0625  loss: 0.0005  time: 0.8781
+2023/07/09 12:49:17 - mmengine - INFO - Epoch(train)  [81][20/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0620  loss: 0.0005  time: 0.8776
+2023/07/09 12:49:26 - mmengine - INFO - Epoch(train)  [81][30/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0619  loss: 0.0004  time: 0.8773
+2023/07/09 12:49:34 - mmengine - INFO - Epoch(train)  [81][40/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0620  loss: 0.0004  time: 0.8773
+2023/07/09 12:49:42 - mmengine - INFO - Epoch(train)  [81][50/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0355  loss: 0.0004  time: 0.8552
+2023/07/09 12:49:45 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:49:45 - mmengine - INFO - Saving checkpoint at 81 epochs
+2023/07/09 12:49:55 - mmengine - INFO - Epoch(val)  [81][10/54]    memory: 4130  
+2023/07/09 12:50:04 - mmengine - INFO - Epoch(val)  [81][20/54]    memory: 1247  
+2023/07/09 12:50:13 - mmengine - INFO - Epoch(val)  [81][30/54]    memory: 1247  
+2023/07/09 12:50:22 - mmengine - INFO - Epoch(val)  [81][40/54]    memory: 1247  
+2023/07/09 12:50:31 - mmengine - INFO - Epoch(val)  [81][50/54]    memory: 1247  
+2023/07/09 12:50:34 - mmengine - INFO - Epoch(val) [81][54/54]    MAE: 0.0170  PSNR: 34.6588  SSIM: 0.8764  data_time: 0.0117  time: 0.8955
+2023/07/09 12:50:34 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_71.pth is removed
+2023/07/09 12:50:34 - mmengine - INFO - The best checkpoint with 34.6588 PSNR at 81 epoch is saved to best_PSNR_epoch_81.pth.
+2023/07/09 12:50:45 - mmengine - INFO - Epoch(train)  [82][10/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0541  loss: 0.0004  time: 0.8695
+2023/07/09 12:50:53 - mmengine - INFO - Epoch(train)  [82][20/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0540  loss: 0.0004  time: 0.8694
+2023/07/09 12:51:02 - mmengine - INFO - Epoch(train)  [82][30/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0540  loss: 0.0004  time: 0.8694
+2023/07/09 12:51:10 - mmengine - INFO - Epoch(train)  [82][40/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0540  loss: 0.0004  time: 0.8695
+2023/07/09 12:51:18 - mmengine - INFO - Epoch(train)  [82][50/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0279  loss: 0.0004  time: 0.8477
+2023/07/09 12:51:21 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:51:21 - mmengine - INFO - Saving checkpoint at 82 epochs
+2023/07/09 12:51:31 - mmengine - INFO - Epoch(val)  [82][10/54]    memory: 4130  
+2023/07/09 12:51:40 - mmengine - INFO - Epoch(val)  [82][20/54]    memory: 1247  
+2023/07/09 12:51:49 - mmengine - INFO - Epoch(val)  [82][30/54]    memory: 1247  
+2023/07/09 12:51:58 - mmengine - INFO - Epoch(val)  [82][40/54]    memory: 1247  
+2023/07/09 12:52:07 - mmengine - INFO - Epoch(val)  [82][50/54]    memory: 1247  
+2023/07/09 12:52:10 - mmengine - INFO - Epoch(val) [82][54/54]    MAE: 0.0175  PSNR: 34.4720  SSIM: 0.8764  data_time: 0.0119  time: 0.8955
+2023/07/09 12:52:21 - mmengine - INFO - Epoch(train)  [83][10/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0544  loss: 0.0004  time: 0.8695
+2023/07/09 12:52:30 - mmengine - INFO - Epoch(train)  [83][20/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0541  loss: 0.0004  time: 0.8692
+2023/07/09 12:52:38 - mmengine - INFO - Epoch(train)  [83][30/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0541  loss: 0.0004  time: 0.8693
+2023/07/09 12:52:46 - mmengine - INFO - Epoch(train)  [83][40/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0541  loss: 0.0004  time: 0.8696
+2023/07/09 12:52:55 - mmengine - INFO - Epoch(train)  [83][50/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0357  loss: 0.0004  time: 0.8553
+2023/07/09 12:52:57 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:52:57 - mmengine - INFO - Saving checkpoint at 83 epochs
+2023/07/09 12:53:07 - mmengine - INFO - Epoch(val)  [83][10/54]    memory: 4130  
+2023/07/09 12:53:16 - mmengine - INFO - Epoch(val)  [83][20/54]    memory: 1247  
+2023/07/09 12:53:25 - mmengine - INFO - Epoch(val)  [83][30/54]    memory: 1247  
+2023/07/09 12:53:34 - mmengine - INFO - Epoch(val)  [83][40/54]    memory: 1247  
+2023/07/09 12:53:43 - mmengine - INFO - Epoch(val)  [83][50/54]    memory: 1247  
+2023/07/09 12:53:47 - mmengine - INFO - Epoch(val) [83][54/54]    MAE: 0.0185  PSNR: 33.9505  SSIM: 0.8753  data_time: 0.0117  time: 0.8949
+2023/07/09 12:53:58 - mmengine - INFO - Epoch(train)  [84][10/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0620  loss: 0.0004  time: 0.8774
+2023/07/09 12:54:06 - mmengine - INFO - Epoch(train)  [84][20/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0619  loss: 0.0004  time: 0.8771
+2023/07/09 12:54:14 - mmengine - INFO - Epoch(train)  [84][30/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0619  loss: 0.0004  time: 0.8771
+2023/07/09 12:54:23 - mmengine - INFO - Epoch(train)  [84][40/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0619  loss: 0.0004  time: 0.8772
+2023/07/09 12:54:31 - mmengine - INFO - Epoch(train)  [84][50/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0355  loss: 0.0004  time: 0.8555
+2023/07/09 12:54:34 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:54:34 - mmengine - INFO - Saving checkpoint at 84 epochs
+2023/07/09 12:54:43 - mmengine - INFO - Epoch(val)  [84][10/54]    memory: 4130  
+2023/07/09 12:54:52 - mmengine - INFO - Epoch(val)  [84][20/54]    memory: 1247  
+2023/07/09 12:55:01 - mmengine - INFO - Epoch(val)  [84][30/54]    memory: 1247  
+2023/07/09 12:55:11 - mmengine - INFO - Epoch(val)  [84][40/54]    memory: 1247  
+2023/07/09 12:55:20 - mmengine - INFO - Epoch(val)  [84][50/54]    memory: 1247  
+2023/07/09 12:55:23 - mmengine - INFO - Epoch(val) [84][54/54]    MAE: 0.0176  PSNR: 34.4125  SSIM: 0.8763  data_time: 0.0116  time: 0.8932
+2023/07/09 12:55:33 - mmengine - INFO - Epoch(train)  [85][10/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0541  loss: 0.0004  time: 0.8700
+2023/07/09 12:55:41 - mmengine - INFO - Epoch(train)  [85][20/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0541  loss: 0.0004  time: 0.8699
+2023/07/09 12:55:50 - mmengine - INFO - Epoch(train)  [85][30/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0540  loss: 0.0004  time: 0.8697
+2023/07/09 12:55:58 - mmengine - INFO - Epoch(train)  [85][40/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0541  loss: 0.0004  time: 0.8698
+2023/07/09 12:56:06 - mmengine - INFO - Epoch(train)  [85][50/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0277  loss: 0.0004  time: 0.8478
+2023/07/09 12:56:09 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:56:09 - mmengine - INFO - Saving checkpoint at 85 epochs
+2023/07/09 12:56:19 - mmengine - INFO - Epoch(val)  [85][10/54]    memory: 4130  
+2023/07/09 12:56:28 - mmengine - INFO - Epoch(val)  [85][20/54]    memory: 1247  
+2023/07/09 12:56:37 - mmengine - INFO - Epoch(val)  [85][30/54]    memory: 1247  
+2023/07/09 12:56:46 - mmengine - INFO - Epoch(val)  [85][40/54]    memory: 1247  
+2023/07/09 12:56:55 - mmengine - INFO - Epoch(val)  [85][50/54]    memory: 1247  
+2023/07/09 12:56:58 - mmengine - INFO - Epoch(val) [85][54/54]    MAE: 0.0174  PSNR: 34.4763  SSIM: 0.8765  data_time: 0.0116  time: 0.8936
+2023/07/09 12:57:09 - mmengine - INFO - Epoch(train)  [86][10/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0467  loss: 0.0004  time: 0.8627
+2023/07/09 12:57:17 - mmengine - INFO - Epoch(train)  [86][20/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0463  loss: 0.0004  time: 0.8623
+2023/07/09 12:57:25 - mmengine - INFO - Epoch(train)  [86][30/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0463  loss: 0.0004  time: 0.8622
+2023/07/09 12:57:34 - mmengine - INFO - Epoch(train)  [86][40/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0463  loss: 0.0004  time: 0.8624
+2023/07/09 12:57:42 - mmengine - INFO - Epoch(train)  [86][50/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0278  loss: 0.0004  time: 0.8480
+2023/07/09 12:57:45 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:57:45 - mmengine - INFO - Saving checkpoint at 86 epochs
+2023/07/09 12:57:54 - mmengine - INFO - Epoch(val)  [86][10/54]    memory: 4130  
+2023/07/09 12:58:03 - mmengine - INFO - Epoch(val)  [86][20/54]    memory: 1247  
+2023/07/09 12:58:13 - mmengine - INFO - Epoch(val)  [86][30/54]    memory: 1247  
+2023/07/09 12:58:22 - mmengine - INFO - Epoch(val)  [86][40/54]    memory: 1247  
+2023/07/09 12:58:31 - mmengine - INFO - Epoch(val)  [86][50/54]    memory: 1247  
+2023/07/09 12:58:34 - mmengine - INFO - Epoch(val) [86][54/54]    MAE: 0.0175  PSNR: 34.4194  SSIM: 0.8765  data_time: 0.0116  time: 0.8944
+2023/07/09 12:58:44 - mmengine - INFO - Epoch(train)  [87][10/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0465  loss: 0.0004  time: 0.8627
+2023/07/09 12:58:52 - mmengine - INFO - Epoch(train)  [87][20/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0465  loss: 0.0004  time: 0.8626
+2023/07/09 12:59:01 - mmengine - INFO - Epoch(train)  [87][30/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0465  loss: 0.0004  time: 0.8625
+2023/07/09 12:59:09 - mmengine - INFO - Epoch(train)  [87][40/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0465  loss: 0.0004  time: 0.8626
+2023/07/09 12:59:18 - mmengine - INFO - Epoch(train)  [87][50/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0278  loss: 0.0004  time: 0.8480
+2023/07/09 12:59:20 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 12:59:20 - mmengine - INFO - Saving checkpoint at 87 epochs
+2023/07/09 12:59:30 - mmengine - INFO - Epoch(val)  [87][10/54]    memory: 4130  
+2023/07/09 12:59:39 - mmengine - INFO - Epoch(val)  [87][20/54]    memory: 1247  
+2023/07/09 12:59:48 - mmengine - INFO - Epoch(val)  [87][30/54]    memory: 1247  
+2023/07/09 12:59:57 - mmengine - INFO - Epoch(val)  [87][40/54]    memory: 1247  
+2023/07/09 13:00:06 - mmengine - INFO - Epoch(val)  [87][50/54]    memory: 1247  
+2023/07/09 13:00:09 - mmengine - INFO - Epoch(val) [87][54/54]    MAE: 0.0170  PSNR: 34.6821  SSIM: 0.8769  data_time: 0.0118  time: 0.8942
+2023/07/09 13:00:09 - mmengine - INFO - The previous best checkpoint ./work_dirs/cvfsid_1xb24_100e_sidd/best_PSNR_epoch_81.pth is removed
+2023/07/09 13:00:10 - mmengine - INFO - The best checkpoint with 34.6821 PSNR at 87 epoch is saved to best_PSNR_epoch_87.pth.
+2023/07/09 13:00:20 - mmengine - INFO - Epoch(train)  [88][10/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0464  loss: 0.0004  time: 0.8622
+2023/07/09 13:00:28 - mmengine - INFO - Epoch(train)  [88][20/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0463  loss: 0.0004  time: 0.8621
+2023/07/09 13:00:37 - mmengine - INFO - Epoch(train)  [88][30/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0463  loss: 0.0004  time: 0.8621
+2023/07/09 13:00:45 - mmengine - INFO - Epoch(train)  [88][40/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0463  loss: 0.0004  time: 0.8622
+2023/07/09 13:00:53 - mmengine - INFO - Epoch(train)  [88][50/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0278  loss: 0.0004  time: 0.8478
+2023/07/09 13:00:56 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 13:00:56 - mmengine - INFO - Saving checkpoint at 88 epochs
+2023/07/09 13:01:06 - mmengine - INFO - Epoch(val)  [88][10/54]    memory: 4130  
+2023/07/09 13:01:15 - mmengine - INFO - Epoch(val)  [88][20/54]    memory: 1247  
+2023/07/09 13:01:24 - mmengine - INFO - Epoch(val)  [88][30/54]    memory: 1247  
+2023/07/09 13:01:33 - mmengine - INFO - Epoch(val)  [88][40/54]    memory: 1247  
+2023/07/09 13:01:42 - mmengine - INFO - Epoch(val)  [88][50/54]    memory: 1247  
+2023/07/09 13:01:45 - mmengine - INFO - Epoch(val) [88][54/54]    MAE: 0.0177  PSNR: 34.2962  SSIM: 0.8768  data_time: 0.0114  time: 0.8936
+2023/07/09 13:01:56 - mmengine - INFO - Epoch(train)  [89][10/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0468  loss: 0.0004  time: 0.8626
+2023/07/09 13:02:04 - mmengine - INFO - Epoch(train)  [89][20/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0463  loss: 0.0004  time: 0.8622
+2023/07/09 13:02:12 - mmengine - INFO - Epoch(train)  [89][30/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0464  loss: 0.0004  time: 0.8623
+2023/07/09 13:02:21 - mmengine - INFO - Epoch(train)  [89][40/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0465  loss: 0.0004  time: 0.8625
+2023/07/09 13:02:29 - mmengine - INFO - Epoch(train)  [89][50/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0281  loss: 0.0004  time: 0.8485
+2023/07/09 13:02:32 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 13:02:32 - mmengine - INFO - Saving checkpoint at 89 epochs
+2023/07/09 13:02:41 - mmengine - INFO - Epoch(val)  [89][10/54]    memory: 4130  
+2023/07/09 13:02:50 - mmengine - INFO - Epoch(val)  [89][20/54]    memory: 1247  
+2023/07/09 13:03:00 - mmengine - INFO - Epoch(val)  [89][30/54]    memory: 1247  
+2023/07/09 13:03:09 - mmengine - INFO - Epoch(val)  [89][40/54]    memory: 1247  
+2023/07/09 13:03:18 - mmengine - INFO - Epoch(val)  [89][50/54]    memory: 1247  
+2023/07/09 13:03:21 - mmengine - INFO - Epoch(val) [89][54/54]    MAE: 0.0185  PSNR: 33.9826  SSIM: 0.8765  data_time: 0.0115  time: 0.8953
+2023/07/09 13:03:32 - mmengine - INFO - Epoch(train)  [90][10/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0516  loss: 0.0004  time: 0.8678
+2023/07/09 13:03:40 - mmengine - INFO - Epoch(train)  [90][20/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0515  loss: 0.0004  time: 0.8678
+2023/07/09 13:03:48 - mmengine - INFO - Epoch(train)  [90][30/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0515  loss: 0.0005  time: 0.8679
+2023/07/09 13:03:57 - mmengine - INFO - Epoch(train)  [90][40/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0516  loss: 0.0005  time: 0.8681
+2023/07/09 13:04:05 - mmengine - INFO - Epoch(train)  [90][50/54]  lr: 9.2274e-05  memory: 4130  data_time: 0.0331  loss: 0.0006  time: 0.8537
+2023/07/09 13:04:08 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 13:04:08 - mmengine - INFO - Saving checkpoint at 90 epochs
+2023/07/09 13:04:17 - mmengine - INFO - Epoch(val)  [90][10/54]    memory: 4130  
+2023/07/09 13:04:27 - mmengine - INFO - Epoch(val)  [90][20/54]    memory: 1247  
+2023/07/09 13:04:36 - mmengine - INFO - Epoch(val)  [90][30/54]    memory: 1247  
+2023/07/09 13:04:45 - mmengine - INFO - Epoch(val)  [90][40/54]    memory: 1247  
+2023/07/09 13:04:54 - mmengine - INFO - Epoch(val)  [90][50/54]    memory: 1247  
+2023/07/09 13:04:57 - mmengine - INFO - Epoch(val) [90][54/54]    MAE: 0.0199  PSNR: 33.3454  SSIM: 0.8752  data_time: 0.0118  time: 0.8947
+2023/07/09 13:05:07 - mmengine - INFO - Epoch(train)  [91][10/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0515  loss: 0.0007  time: 0.8680
+2023/07/09 13:05:16 - mmengine - INFO - Epoch(train)  [91][20/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0514  loss: 0.0007  time: 0.8681
+2023/07/09 13:05:24 - mmengine - INFO - Epoch(train)  [91][30/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0514  loss: 0.0008  time: 0.8681
+2023/07/09 13:05:32 - mmengine - INFO - Epoch(train)  [91][40/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0514  loss: 0.0008  time: 0.8686
+2023/07/09 13:05:41 - mmengine - INFO - Epoch(train)  [91][50/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0280  loss: 0.0008  time: 0.8500
+2023/07/09 13:05:44 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 13:05:44 - mmengine - INFO - Saving checkpoint at 91 epochs
+2023/07/09 13:05:53 - mmengine - INFO - Epoch(val)  [91][10/54]    memory: 4130  
+2023/07/09 13:06:02 - mmengine - INFO - Epoch(val)  [91][20/54]    memory: 1247  
+2023/07/09 13:06:12 - mmengine - INFO - Epoch(val)  [91][30/54]    memory: 1247  
+2023/07/09 13:06:21 - mmengine - INFO - Epoch(val)  [91][40/54]    memory: 1247  
+2023/07/09 13:06:30 - mmengine - INFO - Epoch(val)  [91][50/54]    memory: 1247  
+2023/07/09 13:06:33 - mmengine - INFO - Epoch(val) [91][54/54]    MAE: 0.0183  PSNR: 34.0201  SSIM: 0.8773  data_time: 0.0120  time: 0.8963
+2023/07/09 13:06:44 - mmengine - INFO - Epoch(train)  [92][10/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0546  loss: 0.0008  time: 0.8725
+2023/07/09 13:06:52 - mmengine - INFO - Epoch(train)  [92][20/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0543  loss: 0.0008  time: 0.8721
+2023/07/09 13:07:01 - mmengine - INFO - Epoch(train)  [92][30/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0543  loss: 0.0007  time: 0.8722
+2023/07/09 13:07:09 - mmengine - INFO - Epoch(train)  [92][40/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0543  loss: 0.0007  time: 0.8723
+2023/07/09 13:07:17 - mmengine - INFO - Epoch(train)  [92][50/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0357  loss: 0.0007  time: 0.8579
+2023/07/09 13:07:20 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 13:07:20 - mmengine - INFO - Saving checkpoint at 92 epochs
+2023/07/09 13:07:30 - mmengine - INFO - Epoch(val)  [92][10/54]    memory: 4130  
+2023/07/09 13:07:39 - mmengine - INFO - Epoch(val)  [92][20/54]    memory: 1247  
+2023/07/09 13:07:48 - mmengine - INFO - Epoch(val)  [92][30/54]    memory: 1247  
+2023/07/09 13:07:57 - mmengine - INFO - Epoch(val)  [92][40/54]    memory: 1247  
+2023/07/09 13:08:06 - mmengine - INFO - Epoch(val)  [92][50/54]    memory: 1247  
+2023/07/09 13:08:09 - mmengine - INFO - Epoch(val) [92][54/54]    MAE: 0.0168  PSNR: 34.5113  SSIM: 0.8768  data_time: 0.0119  time: 0.8969
+2023/07/09 13:08:20 - mmengine - INFO - Epoch(train)  [93][10/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0548  loss: 0.0006  time: 0.8727
+2023/07/09 13:08:28 - mmengine - INFO - Epoch(train)  [93][20/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0543  loss: 0.0007  time: 0.8722
+2023/07/09 13:08:36 - mmengine - INFO - Epoch(train)  [93][30/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0543  loss: 0.0009  time: 0.8722
+2023/07/09 13:08:38 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 13:08:45 - mmengine - INFO - Epoch(train)  [93][40/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0544  loss: 0.0011  time: 0.8716
+2023/07/09 13:08:53 - mmengine - INFO - Epoch(train)  [93][50/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0280  loss: 0.0012  time: 0.8495
+2023/07/09 13:08:56 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 13:08:56 - mmengine - INFO - Saving checkpoint at 93 epochs
+2023/07/09 13:09:06 - mmengine - INFO - Epoch(val)  [93][10/54]    memory: 4130  
+2023/07/09 13:09:15 - mmengine - INFO - Epoch(val)  [93][20/54]    memory: 1247  
+2023/07/09 13:09:24 - mmengine - INFO - Epoch(val)  [93][30/54]    memory: 1247  
+2023/07/09 13:09:33 - mmengine - INFO - Epoch(val)  [93][40/54]    memory: 1247  
+2023/07/09 13:09:42 - mmengine - INFO - Epoch(val)  [93][50/54]    memory: 1247  
+2023/07/09 13:09:45 - mmengine - INFO - Epoch(val) [93][54/54]    MAE: 0.0292  PSNR: 29.9973  SSIM: 0.8733  data_time: 0.0114  time: 0.8955
+2023/07/09 13:09:56 - mmengine - INFO - Epoch(train)  [94][10/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0541  loss: 0.0014  time: 0.8714
+2023/07/09 13:10:05 - mmengine - INFO - Epoch(train)  [94][20/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0538  loss: 0.0016  time: 0.8711
+2023/07/09 13:10:13 - mmengine - INFO - Epoch(train)  [94][30/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0538  loss: 0.0018  time: 0.8711
+2023/07/09 13:10:21 - mmengine - INFO - Epoch(train)  [94][40/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0538  loss: 0.0018  time: 0.8712
+2023/07/09 13:10:30 - mmengine - INFO - Epoch(train)  [94][50/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0352  loss: 0.0019  time: 0.8568
+2023/07/09 13:10:32 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 13:10:32 - mmengine - INFO - Saving checkpoint at 94 epochs
+2023/07/09 13:10:42 - mmengine - INFO - Epoch(val)  [94][10/54]    memory: 4130  
+2023/07/09 13:10:51 - mmengine - INFO - Epoch(val)  [94][20/54]    memory: 1247  
+2023/07/09 13:11:00 - mmengine - INFO - Epoch(val)  [94][30/54]    memory: 1247  
+2023/07/09 13:11:09 - mmengine - INFO - Epoch(val)  [94][40/54]    memory: 1247  
+2023/07/09 13:11:19 - mmengine - INFO - Epoch(val)  [94][50/54]    memory: 1247  
+2023/07/09 13:11:22 - mmengine - INFO - Epoch(val) [94][54/54]    MAE: 0.0196  PSNR: 33.2004  SSIM: 0.8721  data_time: 0.0117  time: 0.8963
+2023/07/09 13:11:33 - mmengine - INFO - Epoch(train)  [95][10/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0616  loss: 0.0018  time: 0.8787
+2023/07/09 13:11:41 - mmengine - INFO - Epoch(train)  [95][20/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0611  loss: 0.0016  time: 0.8782
+2023/07/09 13:11:49 - mmengine - INFO - Epoch(train)  [95][30/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0612  loss: 0.0015  time: 0.8781
+2023/07/09 13:11:58 - mmengine - INFO - Epoch(train)  [95][40/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0614  loss: 0.0013  time: 0.8783
+2023/07/09 13:12:06 - mmengine - INFO - Epoch(train)  [95][50/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0355  loss: 0.0012  time: 0.8571
+2023/07/09 13:12:09 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 13:12:09 - mmengine - INFO - Saving checkpoint at 95 epochs
+2023/07/09 13:12:18 - mmengine - INFO - Epoch(val)  [95][10/54]    memory: 4130  
+2023/07/09 13:12:28 - mmengine - INFO - Epoch(val)  [95][20/54]    memory: 1247  
+2023/07/09 13:12:37 - mmengine - INFO - Epoch(val)  [95][30/54]    memory: 1247  
+2023/07/09 13:12:46 - mmengine - INFO - Epoch(val)  [95][40/54]    memory: 1247  
+2023/07/09 13:12:55 - mmengine - INFO - Epoch(val)  [95][50/54]    memory: 1247  
+2023/07/09 13:12:58 - mmengine - INFO - Epoch(val) [95][54/54]    MAE: 0.0173  PSNR: 34.4641  SSIM: 0.8746  data_time: 0.0118  time: 0.8969
+2023/07/09 13:13:09 - mmengine - INFO - Epoch(train)  [96][10/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0600  loss: 0.0009  time: 0.8775
+2023/07/09 13:13:17 - mmengine - INFO - Epoch(train)  [96][20/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0598  loss: 0.0007  time: 0.8772
+2023/07/09 13:13:26 - mmengine - INFO - Epoch(train)  [96][30/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0598  loss: 0.0006  time: 0.8771
+2023/07/09 13:13:34 - mmengine - INFO - Epoch(train)  [96][40/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0599  loss: 0.0006  time: 0.8771
+2023/07/09 13:13:42 - mmengine - INFO - Epoch(train)  [96][50/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0339  loss: 0.0005  time: 0.8555
+2023/07/09 13:13:45 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 13:13:45 - mmengine - INFO - Saving checkpoint at 96 epochs
+2023/07/09 13:13:55 - mmengine - INFO - Epoch(val)  [96][10/54]    memory: 4130  
+2023/07/09 13:14:04 - mmengine - INFO - Epoch(val)  [96][20/54]    memory: 1247  
+2023/07/09 13:14:13 - mmengine - INFO - Epoch(val)  [96][30/54]    memory: 1247  
+2023/07/09 13:14:22 - mmengine - INFO - Epoch(val)  [96][40/54]    memory: 1247  
+2023/07/09 13:14:31 - mmengine - INFO - Epoch(val)  [96][50/54]    memory: 1247  
+2023/07/09 13:14:35 - mmengine - INFO - Epoch(val) [96][54/54]    MAE: 0.0186  PSNR: 33.8671  SSIM: 0.8745  data_time: 0.0138  time: 0.8990
+2023/07/09 13:14:45 - mmengine - INFO - Epoch(train)  [97][10/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0522  loss: 0.0005  time: 0.8697
+2023/07/09 13:14:53 - mmengine - INFO - Epoch(train)  [97][20/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0522  loss: 0.0005  time: 0.8697
+2023/07/09 13:15:02 - mmengine - INFO - Epoch(train)  [97][30/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0521  loss: 0.0004  time: 0.8696
+2023/07/09 13:15:10 - mmengine - INFO - Epoch(train)  [97][40/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0522  loss: 0.0004  time: 0.8693
+2023/07/09 13:15:18 - mmengine - INFO - Epoch(train)  [97][50/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0281  loss: 0.0004  time: 0.8495
+2023/07/09 13:15:21 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 13:15:21 - mmengine - INFO - Saving checkpoint at 97 epochs
+2023/07/09 13:15:31 - mmengine - INFO - Epoch(val)  [97][10/54]    memory: 4130  
+2023/07/09 13:15:40 - mmengine - INFO - Epoch(val)  [97][20/54]    memory: 1247  
+2023/07/09 13:15:49 - mmengine - INFO - Epoch(val)  [97][30/54]    memory: 1247  
+2023/07/09 13:15:58 - mmengine - INFO - Epoch(val)  [97][40/54]    memory: 1247  
+2023/07/09 13:16:07 - mmengine - INFO - Epoch(val)  [97][50/54]    memory: 1247  
+2023/07/09 13:16:10 - mmengine - INFO - Epoch(val) [97][54/54]    MAE: 0.0173  PSNR: 34.4526  SSIM: 0.8756  data_time: 0.0120  time: 0.8973
+2023/07/09 13:16:21 - mmengine - INFO - Epoch(train)  [98][10/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0523  loss: 0.0004  time: 0.8695
+2023/07/09 13:16:29 - mmengine - INFO - Epoch(train)  [98][20/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0518  loss: 0.0004  time: 0.8689
+2023/07/09 13:16:38 - mmengine - INFO - Epoch(train)  [98][30/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0519  loss: 0.0004  time: 0.8690
+2023/07/09 13:16:46 - mmengine - INFO - Epoch(train)  [98][40/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0520  loss: 0.0004  time: 0.8692
+2023/07/09 13:16:55 - mmengine - INFO - Epoch(train)  [98][50/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0336  loss: 0.0004  time: 0.8549
+2023/07/09 13:16:57 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 13:16:57 - mmengine - INFO - Saving checkpoint at 98 epochs
+2023/07/09 13:17:07 - mmengine - INFO - Epoch(val)  [98][10/54]    memory: 4130  
+2023/07/09 13:17:16 - mmengine - INFO - Epoch(val)  [98][20/54]    memory: 1247  
+2023/07/09 13:17:25 - mmengine - INFO - Epoch(val)  [98][30/54]    memory: 1247  
+2023/07/09 13:17:34 - mmengine - INFO - Epoch(val)  [98][40/54]    memory: 1247  
+2023/07/09 13:17:43 - mmengine - INFO - Epoch(val)  [98][50/54]    memory: 1247  
+2023/07/09 13:17:47 - mmengine - INFO - Epoch(val) [98][54/54]    MAE: 0.0175  PSNR: 34.4251  SSIM: 0.8760  data_time: 0.0115  time: 0.8967
+2023/07/09 13:17:58 - mmengine - INFO - Epoch(train)  [99][10/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0601  loss: 0.0004  time: 0.8767
+2023/07/09 13:18:06 - mmengine - INFO - Epoch(train)  [99][20/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0597  loss: 0.0004  time: 0.8760
+2023/07/09 13:18:14 - mmengine - INFO - Epoch(train)  [99][30/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0598  loss: 0.0004  time: 0.8760
+2023/07/09 13:18:23 - mmengine - INFO - Epoch(train)  [99][40/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0598  loss: 0.0004  time: 0.8757
+2023/07/09 13:18:31 - mmengine - INFO - Epoch(train)  [99][50/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0356  loss: 0.0004  time: 0.8556
+2023/07/09 13:18:34 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 13:18:34 - mmengine - INFO - Saving checkpoint at 99 epochs
+2023/07/09 13:18:43 - mmengine - INFO - Epoch(val)  [99][10/54]    memory: 4130  
+2023/07/09 13:18:52 - mmengine - INFO - Epoch(val)  [99][20/54]    memory: 1247  
+2023/07/09 13:19:02 - mmengine - INFO - Epoch(val)  [99][30/54]    memory: 1247  
+2023/07/09 13:19:11 - mmengine - INFO - Epoch(val)  [99][40/54]    memory: 1247  
+2023/07/09 13:19:20 - mmengine - INFO - Epoch(val)  [99][50/54]    memory: 1247  
+2023/07/09 13:19:23 - mmengine - INFO - Epoch(val) [99][54/54]    MAE: 0.0175  PSNR: 34.4234  SSIM: 0.8761  data_time: 0.0118  time: 0.8965
+2023/07/09 13:19:34 - mmengine - INFO - Epoch(train) [100][10/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0608  loss: 0.0004  time: 0.8765
+2023/07/09 13:19:42 - mmengine - INFO - Epoch(train) [100][20/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0605  loss: 0.0004  time: 0.8762
+2023/07/09 13:19:51 - mmengine - INFO - Epoch(train) [100][30/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0605  loss: 0.0004  time: 0.8761
+2023/07/09 13:19:59 - mmengine - INFO - Epoch(train) [100][40/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0605  loss: 0.0004  time: 0.8762
+2023/07/09 13:20:07 - mmengine - INFO - Epoch(train) [100][50/54]  lr: 9.1352e-05  memory: 4130  data_time: 0.0342  loss: 0.0004  time: 0.8543
+2023/07/09 13:20:10 - mmengine - INFO - Exp name: cvfsid_1xb24_100e_sidd_20230709_104054
+2023/07/09 13:20:10 - mmengine - INFO - Saving checkpoint at 100 epochs
+2023/07/09 13:20:19 - mmengine - INFO - Epoch(val) [100][10/54]    memory: 4130  
+2023/07/09 13:20:29 - mmengine - INFO - Epoch(val) [100][20/54]    memory: 1247  
+2023/07/09 13:20:38 - mmengine - INFO - Epoch(val) [100][30/54]    memory: 1247  
+2023/07/09 13:20:47 - mmengine - INFO - Epoch(val) [100][40/54]    memory: 1247  
+2023/07/09 13:20:56 - mmengine - INFO - Epoch(val) [100][50/54]    memory: 1247  
+2023/07/09 13:20:59 - mmengine - INFO - Epoch(val) [100][54/54]    MAE: 0.0174  PSNR: 34.4702  SSIM: 0.8764  data_time: 0.0114  time: 0.8967
+2023/07/09 13:20:59 - mmengine - INFO - [35mLog saved under /media/shuozhang/DATA/Processing/OFFICE/CodingFactory/ImageCoding/mmWorkShop/mmagic/work_dirs/cvfsid_1xb24_100e_sidd/20230709_104054[0m
+2023/07/09 13:20:59 - mmengine - INFO - [35mCheckpoint saved under ./work_dirs/cvfsid_1xb24_100e_sidd[0m
